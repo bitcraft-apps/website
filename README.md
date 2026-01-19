@@ -4,6 +4,10 @@ Bitcraft company website — bitcraftapps.dev
 
 ## Setup
 
+Prerequisites:
+
+- Node.js 22.x (see `.nvmrc`)
+
 Enable Corepack and install dependencies:
 
 ```bash
