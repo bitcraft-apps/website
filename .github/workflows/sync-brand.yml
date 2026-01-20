@@ -1,12 +1,13 @@
-name: Sync Brand Assets
+name: Sync Brand Assets (Polling)
 
 on:
-  repository_dispatch:
-    types: [brand-update]
+  schedule:
+    # Run daily at 8:00 UTC
+    - cron: '0 8 * * *'
   workflow_dispatch:
 
 jobs:
-  update-brand:
+  check-and-sync:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -16,42 +17,71 @@ jobs:
       - name: Checkout Website
         uses: actions/checkout@v4
 
-      - name: Download Brand Assets
-        uses: actions/download-artifact@v4
-        with:
-          name: brand-bundle
-          github-token: ${{ secrets.GH_PAT }}
-          repository: bitcraft-apps/bitcraft-brand
-          run-id: ${{ github.event.client_payload.run_id }}
-          path: temp-brand
-
-      - name: Process Assets
+      - name: Check for Updates
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
-          # Clean old assets
+          # 1. Get Local Version
+          LOCAL_VERSION=$(jq -r .version src/data/brand-version.json)
+          echo "Current local version: $LOCAL_VERSION"
+
+          # 2. Get Remote Version (Latest Release Tag)
+          # We use the GitHub CLI to fetch the latest release tag from the brand repo
+          REMOTE_VERSION=$(gh release view --repo bitcraft-apps/bitcraft-brand --json tagName -q .tagName)
+          echo "Latest remote version: $REMOTE_VERSION"
+
+          # 3. Compare
+          if [ "$LOCAL_VERSION" == "$REMOTE_VERSION" ]; then
+            echo "Versions match. No update needed."
+            echo "update_needed=false" >> $GITHUB_OUTPUT
+          else
+            echo "New version found!"
+            echo "update_needed=true" >> $GITHUB_OUTPUT
+            echo "version=$REMOTE_VERSION" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download & Update Assets
+        if: steps.check.outputs.update_needed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+          VERSION: ${{ steps.check.outputs.version }}
+        run: |
+          echo "Downloading assets for version $VERSION..."
+
+          # Download the specific asset 'brand-bundle.zip' from the release
+          gh release download "$VERSION" \
+            --repo bitcraft-apps/bitcraft-brand \
+            --pattern "brand-bundle.zip" \
+            --dir temp-download
+
+          # Prepare destination
           rm -rf public/brand
           mkdir -p public/brand
 
-          # Move new assets (assuming flat structure in artifact)
-          # Adjust this if artifact has internal structure
-          cp -r temp-brand/* public/brand/
+          # Unzip (assuming flat structure or handling internal folders)
+          unzip -o temp-download/brand-bundle.zip -d public/brand/
 
-          # Cleanup
-          rm -rf temp-brand
+          # Clean up zip
+          rm -rf temp-download
 
-      - name: Update Version
-        run: |
-          echo "{\"version\": \"${{ github.event.client_payload.version }}\"}" > src/data/brand-version.json
+          # Update the local version file
+          # We use a temp file to safely write JSON
+          jq --arg v "$VERSION" '.version = $v' src/data/brand-version.json > temp.json && mv temp.json src/data/brand-version.json
 
       - name: Create Pull Request
+        if: steps.check.outputs.update_needed == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: 'chore(brand): update assets to ${{ github.event.client_payload.version }}'
-          branch: brand-update-${{ github.event.client_payload.version }}
-          title: 'chore(brand): update assets to ${{ github.event.client_payload.version }}'
+          commit-message: 'chore(brand): update assets to ${{ steps.check.outputs.version }}'
+          branch: brand-update-${{ steps.check.outputs.version }}
+          title: 'chore(brand): update assets to ${{ steps.check.outputs.version }}'
           body: |
-            Automated brand asset update.
+            Automated brand asset update detected.
 
-            Source Run ID: ${{ github.event.client_payload.run_id }}
-            Version: ${{ github.event.client_payload.version }}
+            **Old Version:** ${{ steps.check.outputs.local_version }} (implied)
+            **New Version:** ${{ steps.check.outputs.version }}
+
+            This PR was created automatically by the polling workflow.
           delete-branch: true
