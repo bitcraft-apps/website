@@ -20,7 +20,7 @@ jobs:
       - name: Check for Updates
         id: check
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.BRAND_REPO_READ_TOKEN }}
         run: |
           # 1. Get Local Version
           LOCAL_VERSION=$(jq -r .version src/data/brand-version.json)
@@ -44,7 +44,7 @@ jobs:
       - name: Download & Update Assets
         if: steps.check.outputs.update_needed == 'true'
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
+          GH_TOKEN: ${{ secrets.BRAND_REPO_READ_TOKEN }}
           VERSION: ${{ steps.check.outputs.version }}
         run: |
           echo "Downloading assets for version $VERSION..."
