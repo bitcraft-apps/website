@@ -1,0 +1,57 @@
+name: Sync Brand Assets
+
+on:
+  repository_dispatch:
+    types: [brand-update]
+  workflow_dispatch:
+
+jobs:
+  update-brand:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout Website
+        uses: actions/checkout@v4
+
+      - name: Download Brand Assets
+        uses: actions/download-artifact@v4
+        with:
+          name: brand-bundle
+          github-token: ${{ secrets.GH_PAT }}
+          repository: bitcraft-apps/bitcraft-brand
+          run-id: ${{ github.event.client_payload.run_id }}
+          path: temp-brand
+
+      - name: Process Assets
+        run: |
+          # Clean old assets
+          rm -rf public/brand
+          mkdir -p public/brand
+
+          # Move new assets (assuming flat structure in artifact)
+          # Adjust this if artifact has internal structure
+          cp -r temp-brand/* public/brand/
+
+          # Cleanup
+          rm -rf temp-brand
+
+      - name: Update Version
+        run: |
+          echo "{\"version\": \"${{ github.event.client_payload.version }}\"}" > src/data/brand-version.json
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore(brand): update assets to ${{ github.event.client_payload.version }}'
+          branch: brand-update-${{ github.event.client_payload.version }}
+          title: 'chore(brand): update assets to ${{ github.event.client_payload.version }}'
+          body: |
+            Automated brand asset update.
+
+            Source Run ID: ${{ github.event.client_payload.run_id }}
+            Version: ${{ github.event.client_payload.version }}
+          delete-branch: true
