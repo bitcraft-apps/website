@@ -1,0 +1,50 @@
+/* Global styles for Bitcraft Website */
+
+/* Fontsource imports */
+@import '@fontsource/inter';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/jetbrains-mono';
+
+/* Brand tokens */
+@import './tokens.css';
+
+@import 'tailwindcss';
+
+@theme {
+  /* Colors - referencing CSS variables from tokens.css */
+  --color-dark-olive: var(--bitcraft-color-dark-olive);
+  --color-olive-drab: var(--bitcraft-color-olive-drab);
+  --color-forest-green: var(--bitcraft-color-forest-green);
+  --color-near-black: var(--bitcraft-color-neutral-near-black);
+  --color-off-white: var(--bitcraft-color-neutral-off-white);
+  --color-white: var(--bitcraft-color-neutral-white);
+
+  /* Fonts */
+  --font-sans: var(--bitcraft-font-sans);
+  --font-mono: var(--bitcraft-font-mono);
+}
+
+/* Base styles */
+@layer base {
+  html {
+    @apply text-near-black bg-white;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-sans font-semibold;
+  }
+
+  body {
+    @apply font-sans font-normal;
+  }
+
+  code,
+  pre {
+    @apply font-mono;
+  }
+}
