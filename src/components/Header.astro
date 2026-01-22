@@ -114,6 +114,9 @@ const currentPath = Astro.url.pathname;
 </header>
 
 <script>
+  // Track if document-level listeners have been registered to prevent accumulation
+  let documentListenersRegistered = false;
+
   function initMobileMenu() {
     const button = document.getElementById("mobile-menu-button") as HTMLButtonElement | null;
     const menu = document.getElementById("mobile-menu") as HTMLElement | null;
@@ -155,16 +158,27 @@ const currentPath = Astro.url.pathname;
       }
     }
 
+    function handleEscapeKey(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        const btn = document.getElementById("mobile-menu-button");
+        if (btn?.getAttribute("aria-expanded") === "true") {
+          closeMenu();
+          btn.focus();
+        }
+      }
+    }
+
+    function handleClickOutside(event: MouseEvent) {
+      const btn = document.getElementById("mobile-menu-button");
+      const target = event.target as Node;
+      const header = btn?.closest("header");
+      if (header && !header.contains(target) && btn?.getAttribute("aria-expanded") === "true") {
+        closeMenu();
+      }
+    }
+
     // Toggle on button click
     button.addEventListener("click", toggleMenu);
-
-    // Close on Escape key
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && button!.getAttribute("aria-expanded") === "true") {
-        closeMenu();
-        button!.focus();
-      }
-    });
 
     // Close menu when clicking a link (for SPA-like behavior)
     mobileLinks.forEach((link) => {
@@ -173,19 +187,16 @@ const currentPath = Astro.url.pathname;
       });
     });
 
-    // Close menu when clicking outside
-    document.addEventListener("click", (event) => {
-      const target = event.target as Node;
-      const header = button!.closest("header");
-      if (header && !header.contains(target) && button!.getAttribute("aria-expanded") === "true") {
-        closeMenu();
-      }
-    });
+    // Register document-level listeners only once to prevent accumulation
+    // on repeated View Transitions navigations
+    if (!documentListenersRegistered) {
+      document.addEventListener("keydown", handleEscapeKey);
+      document.addEventListener("click", handleClickOutside);
+      documentListenersRegistered = true;
+    }
   }
 
-  // Initialize on page load
-  initMobileMenu();
-
-  // Re-initialize on Astro page transitions (View Transitions)
+  // Initialize on page load and re-initialize on Astro View Transitions
+  // Note: astro:page-load fires on initial page load as well as navigations
   document.addEventListener("astro:page-load", initMobileMenu);
 </script>
