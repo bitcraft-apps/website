@@ -65,13 +65,14 @@ jobs:
           rm -rf public/brand
           mkdir -p public/brand
 
-          # Unzip (assuming flat structure or handling internal folders)
-          # Use find to locate the zip file regardless of the version suffix
-          ZIP_FILE=$(find temp-download -name "*brand-bundle*.zip" | head -n 1)
-          unzip -o "$ZIP_FILE" -d public/brand/
+          # Unzip to a temporary directory first
+          unzip -o "$ZIP_FILE" -d temp-unzip
 
-          # Clean up zip
-          rm -rf temp-download
+          # Move contents of the 'bundle' directory to public/brand
+          cp -R temp-unzip/bundle/* public/brand/
+
+          # Clean up temp directories
+          rm -rf temp-download temp-unzip
 
           # Update the local version file
           # We use a temp file to safely write JSON
