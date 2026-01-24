@@ -24,6 +24,7 @@ export const DEFAULT_OG_IMAGE = {
  * Uses Astro's SITE env variable from astro.config.mjs.
  * Fails fast in production to prevent broken SEO.
  */
+let siteUrlDevWarnShown = false;
 export const getSiteUrl = (): string => {
   const site = import.meta.env.SITE;
   if (!site) {
@@ -32,7 +33,10 @@ export const getSiteUrl = (): string => {
         '[SEO] SITE URL must be configured in astro.config.mjs for production builds',
       );
     }
-    console.warn('[SEO] SITE URL not configured, using localhost fallback for development');
+    if (!siteUrlDevWarnShown) {
+      console.warn('[SEO] SITE URL not configured, using localhost fallback for development');
+      siteUrlDevWarnShown = true;
+    }
     return 'http://localhost:4321';
   }
   return site;

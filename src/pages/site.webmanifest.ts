@@ -22,6 +22,9 @@ export const GET: APIRoute = () => {
         src: '/android-chrome-512x512.png',
         sizes: '512x512',
         type: 'image/png',
+        // Maskable icons require content within the inner 80% "safe zone" to avoid clipping.
+        // Verify the logo has adequate padding before using as maskable.
+        // See: https://web.dev/maskable-icon/
         purpose: 'maskable',
       },
     ],
