@@ -10,11 +10,21 @@ export const SITE_DESCRIPTION = 'Bitcraft — web experiences and tools for Bitc
 export const BRAND_COLOR = '#556B2F';
 
 /**
- * Default Open Graph image path (relative to site root).
+ * Default Open Graph image configuration.
  * Used for social sharing previews when no specific image is provided.
- * Recommended dimensions: 1200x630px minimum for optimal display on social platforms.
+ * Dimensions follow Facebook/LinkedIn recommendations (1200x630px).
  */
-export const DEFAULT_OG_IMAGE = '/brand/og-default.png';
+export const DEFAULT_OG_IMAGE = {
+  path: '/brand/og-default.png',
+  width: 1200,
+  height: 630,
+} as const;
+
+/**
+ * Get the site URL with fallback for local development.
+ * Uses Astro's SITE env variable from astro.config.mjs.
+ */
+export const getSiteUrl = (): string => import.meta.env.SITE || 'http://localhost:4321';
 
 /**
  * Logo image for JSON-LD structured data (relative to site root).

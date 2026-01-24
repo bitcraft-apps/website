@@ -1,7 +1,8 @@
 import type { APIRoute } from 'astro';
+import { getSiteUrl } from '../consts';
 
 export const GET: APIRoute = () => {
-  const siteUrl = import.meta.env.SITE || 'http://localhost:4321';
+  const siteUrl = getSiteUrl();
 
   const robotsTxt = `User-agent: *
 Allow: /
