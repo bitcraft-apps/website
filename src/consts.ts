@@ -4,12 +4,22 @@
 export const SITE_TITLE = 'Bitcraft';
 export const SITE_DESCRIPTION = 'Bitcraft — web experiences and tools for Bitcraft and beyond.';
 
+/** Brand color used for theme-color meta tag and PWA manifest */
+export const BRAND_COLOR = '#556B2F';
+
 /**
  * Default Open Graph image path (relative to site root).
  * Used for social sharing previews when no specific image is provided.
  * Recommended dimensions: 1200x630px minimum for optimal display on social platforms.
  */
 export const DEFAULT_OG_IMAGE = '/brand/og-default.png';
+
+/**
+ * Logo image for JSON-LD structured data (relative to site root).
+ * Google recommends a logo with width ≥112px and aspect ratio close to 1:1.
+ * Uses the 512x512 Android Chrome icon as a suitable square logo.
+ */
+export const LOGO_IMAGE = '/android-chrome-512x512.png';
 
 /** Tag used to mark projects as featured on the homepage */
 export const FEATURED_TAG = 'featured' as const;

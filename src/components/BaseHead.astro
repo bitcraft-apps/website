@@ -1,5 +1,5 @@
 ---
-import { SITE_TITLE, CONTACT, DEFAULT_OG_IMAGE } from '../consts';
+import { SITE_TITLE, CONTACT, DEFAULT_OG_IMAGE, LOGO_IMAGE, BRAND_COLOR } from '../consts';
 
 interface Props {
   title: string;
@@ -9,8 +9,8 @@ interface Props {
 
 const { title, description, image = DEFAULT_OG_IMAGE } = Astro.props;
 
-// Use Astro's site config to avoid URL duplication with consts.ts
-const siteUrl = import.meta.env.SITE;
+// Use Astro's site config with fallback for local development
+const siteUrl = import.meta.env.SITE || 'http://localhost:4321';
 const canonicalURL = new URL(Astro.url.pathname, siteUrl).href;
 const ogImageURL = new URL(image, siteUrl).href;
 
@@ -23,7 +23,7 @@ const jsonLd = {
       '@id': `${siteUrl}/#organization`,
       name: SITE_TITLE,
       url: siteUrl,
-      logo: new URL(DEFAULT_OG_IMAGE, siteUrl).href,
+      logo: new URL(LOGO_IMAGE, siteUrl).href,
       sameAs: [CONTACT.github],
     },
     {
@@ -44,7 +44,7 @@ const jsonLd = {
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="manifest" href="/site.webmanifest" />
-<meta name="theme-color" content="#556B2F" />
+<meta name="theme-color" content={BRAND_COLOR} />
 <meta name="generator" content={Astro.generator} />
 
 <!-- Canonical URL -->
@@ -68,6 +68,7 @@ const jsonLd = {
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={ogImageURL} />
+<meta name="twitter:image:alt" content={`${SITE_TITLE} - ${title}`} />
 
 <!-- JSON-LD Structured Data -->
 <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
