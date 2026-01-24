@@ -4,15 +4,14 @@
 export const SITE_TITLE = 'Bitcraft';
 export const SITE_DESCRIPTION = 'Bitcraft — web experiences and tools for Bitcraft and beyond.';
 
-/** Brand color used for theme-color meta tag and PWA manifest.
- * NOTE: Also defined in public/site.webmanifest - keep in sync if changed.
- */
+/** Brand color used for theme-color meta tag and PWA manifest. */
 export const BRAND_COLOR = '#556B2F';
 
 /**
  * Default Open Graph image configuration.
  * Used for social sharing previews when no specific image is provided.
  * Dimensions follow Facebook/LinkedIn recommendations (1200x630px).
+ * NOTE: If replacing the image, update width/height to match the actual dimensions.
  */
 export const DEFAULT_OG_IMAGE = {
   path: '/brand/og-default.png',
