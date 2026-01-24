@@ -11,6 +11,11 @@ const { title, description, image = DEFAULT_OG_IMAGE } = Astro.props;
 
 // Use Astro's site config with fallback for local development
 const siteUrl = import.meta.env.SITE || 'http://localhost:4321';
+
+// Warn if site URL is missing in production (would break SEO)
+if (!import.meta.env.SITE && import.meta.env.PROD) {
+  console.warn('⚠️ No site URL configured in astro.config.mjs - SEO tags will use localhost');
+}
 const canonicalURL = new URL(Astro.url.pathname, siteUrl).href;
 const ogImageURL = new URL(image, siteUrl).href;
 
@@ -53,6 +58,7 @@ const jsonLd = {
 <!-- Primary Meta Tags -->
 <title>{title}</title>
 <meta name="description" content={description} />
+<meta name="robots" content="index, follow" />
 
 <!-- Open Graph -->
 <meta property="og:type" content="website" />
@@ -62,8 +68,11 @@ const jsonLd = {
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={ogImageURL} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
 
 <!-- Twitter Card -->
+<!-- TODO: Add twitter:site and twitter:creator when official handles are available -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />

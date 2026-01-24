@@ -4,7 +4,9 @@
 export const SITE_TITLE = 'Bitcraft';
 export const SITE_DESCRIPTION = 'Bitcraft — web experiences and tools for Bitcraft and beyond.';
 
-/** Brand color used for theme-color meta tag and PWA manifest */
+/** Brand color used for theme-color meta tag and PWA manifest.
+ * NOTE: Also defined in public/site.webmanifest - keep in sync if changed.
+ */
 export const BRAND_COLOR = '#556B2F';
 
 /**
