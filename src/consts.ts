@@ -52,6 +52,13 @@ export const LOGO_IMAGE = '/android-chrome-512x512.png';
 /** Tag used to mark projects as featured on the homepage */
 export const FEATURED_TAG = 'featured' as const;
 
+/** Tags used for internal filtering, not for display */
+const SYSTEM_TAGS: readonly string[] = [FEATURED_TAG];
+
+/** Filter out system tags (like 'featured') that are used for filtering, not display */
+export const getDisplayTags = (tags?: string[]): string[] =>
+  tags?.filter((tag) => !SYSTEM_TAGS.includes(tag)) ?? [];
+
 /** Maximum number of featured projects to display on homepage */
 export const MAX_FEATURED_PROJECTS = 3;
 
