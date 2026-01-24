@@ -10,9 +10,11 @@ import { FEATURED_TAG } from '../consts';
 interface Props {
   project: CollectionEntry<'projects'>;
   featured?: boolean;
+  /** When true, image loads eagerly (use for above-fold LCP optimization) */
+  priority?: boolean;
 }
 
-const { project, featured = false } = Astro.props;
+const { project, featured = false, priority = false } = Astro.props;
 const { title, description, pubDate, repository, image, tags } = project.data;
 
 const formattedDate = pubDate.toLocaleDateString('en-US', {
@@ -34,8 +36,9 @@ const formattedDate = pubDate.toLocaleDateString('en-US', {
           width="400"
           height="208"
           class="w-full h-52 object-cover transform group-hover:scale-105 transition-transform duration-500"
-          loading="lazy"
+          loading={priority ? 'eager' : 'lazy'}
           decoding="async"
+          fetchpriority={priority ? 'high' : undefined}
         />
       </a>
     ) : (

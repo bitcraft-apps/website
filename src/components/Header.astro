@@ -116,9 +116,6 @@ const currentPath = Astro.url.pathname;
 </header>
 
 <script>
-  // Track if document-level listeners have been registered to prevent accumulation
-  let documentListenersRegistered = false;
-
   function initMobileMenu() {
     const button = document.getElementById('mobile-menu-button') as HTMLButtonElement | null;
     const menu = document.getElementById('mobile-menu') as HTMLElement | null;
@@ -195,11 +192,12 @@ const currentPath = Astro.url.pathname;
     });
 
     // Register document-level listeners only once to prevent accumulation
-    // on repeated View Transitions navigations
-    if (!documentListenersRegistered) {
+    // on repeated View Transitions navigations. Use data attribute on
+    // documentElement for persistence across module re-evaluations.
+    if (!document.documentElement.dataset.mobileMenuListenersRegistered) {
       document.addEventListener('keydown', handleEscapeKey);
       document.addEventListener('click', handleClickOutside);
-      documentListenersRegistered = true;
+      document.documentElement.dataset.mobileMenuListenersRegistered = 'true';
     }
   }
 

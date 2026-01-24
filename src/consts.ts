@@ -23,9 +23,11 @@ const FOUNDER_NAME = 'Szymon Graczyk';
 
 export const FOUNDER = {
   name: FOUNDER_NAME,
-  initials: FOUNDER_NAME.split(' ')
-    .map((n) => n[0])
-    .join(''),
+  initials:
+    FOUNDER_NAME.split(' ')
+      .filter((n) => n.length > 0)
+      .map((n) => n[0])
+      .join('') || '?',
   role: 'Founder & Lead Engineer',
   quote:
     'We treat every line of code as a piece of craftsmanship, because we believe the details matter.',

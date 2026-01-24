@@ -80,8 +80,11 @@ const icon = icons[name];
 
 // Runtime validation in development mode
 if (import.meta.env.DEV && !icon) {
-  console.warn(`[Icon] Unknown icon name: "${name}". Available icons: ${Object.keys(icons).join(', ')}`);
+  console.error(`[Icon] Unknown icon name: "${name}". Available icons: ${Object.keys(icons).join(', ')}`);
 }
+
+// Fallback to empty string if icon not found (already warned in dev)
+const iconPath = icon?.path ?? '';
 
 const isFilled = icon?.filled ?? false;
 ---
@@ -94,5 +97,5 @@ const isFilled = icon?.filled ?? false;
   stroke={isFilled ? undefined : 'currentColor'}
   class:list={[sizeClass, className]}
   aria-hidden="true"
-  set:html={icon?.path}
+  set:html={iconPath}
 />
