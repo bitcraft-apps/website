@@ -1,0 +1,480 @@
+---
+/**
+ * ContactForm component with Formspree integration
+ * - Accessible form with proper labels and ARIA attributes
+ * - Client-side validation (HTML5 + JavaScript)
+ * - Async submission with loading, success, and error states
+ */
+
+interface Props {
+  /** Optional Formspree form ID - overrides environment variable if provided */
+  formId?: string;
+}
+
+// Use prop if provided, otherwise fall back to environment variable
+const formId = Astro.props.formId ?? import.meta.env.PUBLIC_FORMSPREE_ID;
+
+// Build-time check for missing Formspree ID
+if (!formId) {
+  throw new Error(
+    'Missing Formspree ID. Set PUBLIC_FORMSPREE_ID environment variable or pass formId prop to ContactForm.',
+  );
+}
+
+const formAction = `https://formspree.io/f/${formId}`;
+
+// Generate unique ID for this form instance to prevent conflicts with multiple forms
+const uniqueId = `cf-${Math.random().toString(36).slice(2, 9)}`;
+---
+
+<form
+  id={`${uniqueId}-form`}
+  data-contact-form
+  action={formAction}
+  method="POST"
+  class="relative space-y-6"
+  novalidate
+>
+  <!-- Name Field -->
+  <div>
+    <label for={`${uniqueId}-name`} class="block text-sm font-semibold text-near-black mb-2">
+      Name <span class="text-forest-green" aria-hidden="true">*</span>
+      <span class="sr-only">(required)</span>
+    </label>
+    <input
+      type="text"
+      id={`${uniqueId}-name`}
+      name="name"
+      required
+      autocomplete="name"
+      placeholder="Your name"
+      class="w-full px-4 py-3 border border-olive-drab/30 rounded-lg bg-white text-near-black placeholder-near-black/50 focus:outline-none focus:ring-2 focus:ring-forest-green focus:border-transparent transition-shadow duration-200"
+      data-field="name"
+    />
+    <p
+      id={`${uniqueId}-name-error`}
+      class="mt-1 text-sm text-red-600 hidden"
+      role="alert"
+      data-error="name"
+    >
+    </p>
+  </div>
+
+  <!-- Email Field -->
+  <div>
+    <label for={`${uniqueId}-email`} class="block text-sm font-semibold text-near-black mb-2">
+      Email <span class="text-forest-green" aria-hidden="true">*</span>
+      <span class="sr-only">(required)</span>
+    </label>
+    <input
+      type="email"
+      id={`${uniqueId}-email`}
+      name="email"
+      required
+      autocomplete="email"
+      placeholder="your@email.com"
+      class="w-full px-4 py-3 border border-olive-drab/30 rounded-lg bg-white text-near-black placeholder-near-black/50 focus:outline-none focus:ring-2 focus:ring-forest-green focus:border-transparent transition-shadow duration-200"
+      data-field="email"
+    />
+    <p
+      id={`${uniqueId}-email-error`}
+      class="mt-1 text-sm text-red-600 hidden"
+      role="alert"
+      data-error="email"
+    >
+    </p>
+  </div>
+
+  <!-- Message Field -->
+  <div>
+    <label for={`${uniqueId}-message`} class="block text-sm font-semibold text-near-black mb-2">
+      Message <span class="text-forest-green" aria-hidden="true">*</span>
+      <span class="sr-only">(required)</span>
+    </label>
+    <textarea
+      id={`${uniqueId}-message`}
+      name="message"
+      required
+      rows="5"
+      placeholder="How can I help you?"
+      class="w-full px-4 py-3 border border-olive-drab/30 rounded-lg bg-white text-near-black placeholder-near-black/50 focus:outline-none focus:ring-2 focus:ring-forest-green focus:border-transparent transition-shadow duration-200 resize-y"
+      data-field="message"></textarea>
+    <p
+      id={`${uniqueId}-message-error`}
+      class="mt-1 text-sm text-red-600 hidden"
+      role="alert"
+      data-error="message"
+    >
+    </p>
+  </div>
+
+  <!-- Honeypot field for spam protection - bots will fill this, humans won't see it -->
+  <div class="absolute -left-[9999px]" aria-hidden="true">
+    <label for={`${uniqueId}-gotcha`}>
+      Don't fill this out if you're human
+      <input
+        type="text"
+        id={`${uniqueId}-gotcha`}
+        name="_gotcha"
+        tabindex="-1"
+        autocomplete="off"
+        data-field="honeypot"
+      />
+    </label>
+  </div>
+
+  <!-- Submit Button -->
+  <div>
+    <button
+      type="submit"
+      data-submit-button
+      class="w-full sm:w-auto px-8 py-3 bg-dark-olive text-white font-semibold rounded-lg hover:bg-olive-drab focus:outline-none focus:ring-2 focus:ring-forest-green focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      <span data-button-text>Send Message</span>
+      <span data-button-loading class="hidden">
+        <svg
+          class="animate-spin inline-block h-5 w-5 mr-2"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"
+          ></circle>
+          <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          ></path>
+        </svg>
+        Sending...
+      </span>
+    </button>
+  </div>
+
+  <!-- Success Message -->
+  <div
+    data-success-message
+    class="hidden p-4 bg-forest-green/10 border border-forest-green rounded-lg"
+    role="alert"
+    aria-live="polite"
+    aria-hidden="true"
+  >
+    <div class="flex items-center">
+      <svg
+        class="h-5 w-5 text-forest-green mr-3 flex-shrink-0"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"
+        ></path>
+      </svg>
+      <p class="text-forest-green font-medium">
+        Thank you! Your message has been sent successfully. I'll get back to you soon.
+      </p>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div
+    data-error-message
+    class="hidden p-4 bg-red-50 border border-red-500 rounded-lg"
+    role="alert"
+    aria-live="polite"
+    aria-hidden="true"
+  >
+    <div class="flex items-center">
+      <svg
+        class="h-5 w-5 text-red-500 mr-3 flex-shrink-0"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+      <p class="text-red-600 font-medium" data-error-text>
+        Something went wrong. Please try again or email me directly.
+      </p>
+    </div>
+  </div>
+</form>
+
+<script>
+  // Track initialized forms to prevent duplicate event listeners
+  const initializedForms: WeakSet<HTMLFormElement> = new WeakSet();
+
+  function initContactForms() {
+    document.querySelectorAll<HTMLFormElement>('[data-contact-form]').forEach((form) => {
+      // Prevent duplicate initialization on the same form element
+      if (initializedForms.has(form)) return;
+      initializedForms.add(form);
+
+      const submitButton = form.querySelector<HTMLButtonElement>('[data-submit-button]');
+      const buttonText = form.querySelector<HTMLSpanElement>('[data-button-text]');
+      const buttonLoading = form.querySelector<HTMLSpanElement>('[data-button-loading]');
+      const successMessage = form.querySelector<HTMLDivElement>('[data-success-message]');
+      const errorMessage = form.querySelector<HTMLDivElement>('[data-error-message]');
+      const errorText = form.querySelector<HTMLParagraphElement>('[data-error-text]');
+
+      // Field elements
+      const nameInput = form.querySelector<HTMLInputElement>('[data-field="name"]');
+      const emailInput = form.querySelector<HTMLInputElement>('[data-field="email"]');
+      const messageInput = form.querySelector<HTMLTextAreaElement>('[data-field="message"]');
+
+      // Error elements
+      const nameError = form.querySelector<HTMLParagraphElement>('[data-error="name"]');
+      const emailError = form.querySelector<HTMLParagraphElement>('[data-error="email"]');
+      const messageError = form.querySelector<HTMLParagraphElement>('[data-error="message"]');
+
+      // Guard: ensure all required elements exist before attaching handlers
+      if (
+        !submitButton ||
+        !buttonText ||
+        !buttonLoading ||
+        !successMessage ||
+        !errorMessage ||
+        !errorText ||
+        !nameInput ||
+        !emailInput ||
+        !messageInput ||
+        !nameError ||
+        !emailError ||
+        !messageError
+      ) {
+        if (import.meta.env.DEV) {
+          console.warn(
+            '[ContactForm] Failed to initialize form: one or more required DOM elements are missing.',
+            { formId: form.id },
+          );
+        }
+        return;
+      }
+
+      // Create local references with narrowed types for use in closures
+      const elements = {
+        submitButton,
+        buttonText,
+        buttonLoading,
+        successMessage,
+        errorMessage,
+        errorText,
+        nameInput,
+        emailInput,
+        messageInput,
+        nameError,
+        emailError,
+        messageError,
+      };
+
+      /**
+       * Clear validation state for a single field
+       */
+      function clearFieldValidation(
+        input: HTMLInputElement | HTMLTextAreaElement,
+        errorEl: HTMLParagraphElement,
+      ): void {
+        errorEl.classList.add('hidden');
+        errorEl.textContent = '';
+        input.classList.remove('border-red-500');
+        input.removeAttribute('aria-invalid');
+        input.removeAttribute('aria-describedby');
+      }
+
+      /**
+       * Clear validation state for all fields
+       */
+      function clearAllValidation(): void {
+        clearFieldValidation(elements.nameInput, elements.nameError);
+        clearFieldValidation(elements.emailInput, elements.emailError);
+        clearFieldValidation(elements.messageInput, elements.messageError);
+      }
+
+      /**
+       * Validate a single field and show/hide error message
+       */
+      function validateField(
+        input: HTMLInputElement | HTMLTextAreaElement,
+        errorEl: HTMLParagraphElement,
+      ): boolean {
+        const trimmedValue = input.value.trim();
+        let errorText = '';
+
+        if (!trimmedValue) {
+          errorText = 'This field is required';
+        } else if (
+          input instanceof HTMLInputElement &&
+          input.type === 'email' &&
+          !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedValue)
+        ) {
+          errorText = 'Please enter a valid email address';
+        }
+
+        if (errorText) {
+          errorEl.textContent = errorText;
+          errorEl.classList.remove('hidden');
+          input.classList.add('border-red-500');
+          input.setAttribute('aria-invalid', 'true');
+          input.setAttribute('aria-describedby', errorEl.id);
+          return false;
+        } else {
+          errorEl.classList.add('hidden');
+          input.classList.remove('border-red-500');
+          input.removeAttribute('aria-invalid');
+          input.removeAttribute('aria-describedby');
+          return true;
+        }
+      }
+
+      /**
+       * Validate all fields
+       */
+      function validateForm(): boolean {
+        const isNameValid = validateField(elements.nameInput, elements.nameError);
+        const isEmailValid = validateField(elements.emailInput, elements.emailError);
+        const isMessageValid = validateField(elements.messageInput, elements.messageError);
+        return isNameValid && isEmailValid && isMessageValid;
+      }
+
+      /**
+       * Set loading state
+       */
+      function setLoading(loading: boolean): void {
+        elements.submitButton.disabled = loading;
+        elements.buttonText.classList.toggle('hidden', loading);
+        elements.buttonLoading.classList.toggle('hidden', !loading);
+      }
+
+      /**
+       * Reset form state and hide messages
+       */
+      function resetFormState(): void {
+        elements.successMessage.classList.add('hidden');
+        elements.successMessage.setAttribute('aria-hidden', 'true');
+        elements.errorMessage.classList.add('hidden');
+        elements.errorMessage.setAttribute('aria-hidden', 'true');
+      }
+
+      /**
+       * Create FormData with trimmed values
+       */
+      function createTrimmedFormData(): FormData {
+        const formData = new FormData();
+        formData.append('name', elements.nameInput.value.trim());
+        formData.append('email', elements.emailInput.value.trim());
+        formData.append('message', elements.messageInput.value.trim());
+
+        // Include honeypot field for Formspree spam filtering
+        const honeypotInput = form.querySelector<HTMLInputElement>('[data-field="honeypot"]');
+        if (honeypotInput) {
+          formData.append('_gotcha', honeypotInput.value);
+        }
+
+        return formData;
+      }
+
+      // Add blur validation to each field
+      [
+        { input: elements.nameInput, error: elements.nameError },
+        { input: elements.emailInput, error: elements.emailError },
+        { input: elements.messageInput, error: elements.messageError },
+      ].forEach(({ input, error }) => {
+        input.addEventListener('blur', () => validateField(input, error));
+        input.addEventListener('input', () => {
+          if (input.getAttribute('aria-invalid')) {
+            validateField(input, error);
+          }
+        });
+      });
+
+      // Track submission state to prevent double-clicks
+      let isSubmitting = false;
+
+      // Form submission handler
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Guard against double submissions
+        if (isSubmitting) return;
+        isSubmitting = true;
+
+        resetFormState();
+
+        if (!validateForm()) {
+          // Focus first invalid field
+          const firstInvalid = form.querySelector('[aria-invalid="true"]') as HTMLElement;
+          firstInvalid?.focus();
+          isSubmitting = false;
+          return;
+        }
+
+        setLoading(true);
+
+        try {
+          const formData = createTrimmedFormData();
+          const response = await fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+              Accept: 'application/json',
+            },
+          });
+
+          if (response.ok) {
+            elements.successMessage.classList.remove('hidden');
+            elements.successMessage.setAttribute('aria-hidden', 'false');
+            form.reset();
+            clearAllValidation();
+            // Scroll success message into view
+            elements.successMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          } else {
+            // Parse Formspree error response for more specific messages
+            let errorMsg = 'Something went wrong. Please try again or email me directly.';
+            try {
+              const data = await response.json();
+              if (data.error) {
+                errorMsg = data.error;
+              } else if (data.errors && Array.isArray(data.errors)) {
+                // Formspree returns errors as an array of objects with 'message' field
+                const messages = data.errors
+                  .map((err: { message?: string }) => err.message)
+                  .filter(Boolean);
+                if (messages.length > 0) {
+                  errorMsg = messages.join('. ');
+                }
+              }
+            } catch {
+              // If response isn't valid JSON, use generic error message
+            }
+            elements.errorText.textContent = errorMsg;
+            elements.errorMessage.classList.remove('hidden');
+            elements.errorMessage.setAttribute('aria-hidden', 'false');
+            elements.errorMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        } catch (error) {
+          console.error('Contact form submission failed:', error);
+          elements.errorText.textContent =
+            'Network error. Please check your connection and try again, or email me directly.';
+          elements.errorMessage.classList.remove('hidden');
+          elements.errorMessage.setAttribute('aria-hidden', 'false');
+          elements.errorMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } finally {
+          setLoading(false);
+          isSubmitting = false;
+        }
+      });
+    });
+  }
+
+  // Initialize immediately for standard page loads (without View Transitions)
+  initContactForms();
+
+  // Re-initialize on View Transitions navigation (when enabled)
+  document.addEventListener('astro:page-load', initContactForms);
+</script>
