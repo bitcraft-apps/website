@@ -6,7 +6,7 @@ interface Props {
   height?: number;
 }
 
-const { variant = 'default', class: className, width, height } = Astro.props;
+const { variant = 'default', class: className, width = 132, height = 140 } = Astro.props;
 
 const logoMap = {
   default: '/images/bitcraft-logo.svg',
