@@ -3,6 +3,9 @@
 
 export const SITE_DESCRIPTION = 'Bitcraft — web experiences and tools for Bitcraft and beyond.';
 
+/** Tag used to mark projects as featured on the homepage */
+export const FEATURED_TAG = 'featured' as const;
+
 export interface NavItem {
   href: string;
   label: string;

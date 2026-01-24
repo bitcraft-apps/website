@@ -5,6 +5,7 @@
  */
 import type { CollectionEntry } from 'astro:content';
 import Icon from './Icon.astro';
+import { FEATURED_TAG } from '../consts';
 
 interface Props {
   project: CollectionEntry<'projects'>;
@@ -90,7 +91,7 @@ const formattedDate = pubDate.toLocaleDateString('en-US', {
       tags && tags.length > 0 && (
         <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-olive-drab/10">
           {tags
-            .filter((tag) => tag !== 'featured')
+            .filter((tag) => tag !== FEATURED_TAG)
             .map((tag) => (
               <span class="text-xs font-medium px-2.5 py-1 rounded-full bg-off-white text-dark-olive/80 border border-olive-drab/10">
                 {tag}

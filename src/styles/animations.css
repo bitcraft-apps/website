@@ -75,6 +75,10 @@
   }
 }
 
+/* Bounce animation for centered elements.
+   NOTE: This animation assumes the element is horizontally centered using
+   `left-1/2` (or equivalent). It includes translateX(-50%) to maintain
+   centering during the bounce. Do not use on non-centered elements. */
 @keyframes bounce-slow {
   0%,
   100% {
