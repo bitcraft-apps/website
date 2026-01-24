@@ -1,7 +1,53 @@
-// Place any global data in this file.
-// You can import this data from anywhere in your site by using the `import` keyword.
-
+export const SITE_TITLE = 'Bitcraft';
 export const SITE_DESCRIPTION = 'Bitcraft — web experiences and tools for Bitcraft and beyond.';
+
+/** Brand color used for theme-color meta tag and PWA manifest. */
+export const BRAND_COLOR = '#556B2F';
+
+/** Background color for PWA splash screen. */
+export const BACKGROUND_COLOR = '#FFFFFF';
+
+/**
+ * Default Open Graph image configuration.
+ * Used for social sharing previews when no specific image is provided.
+ * Dimensions follow Facebook/LinkedIn recommendations (1200x630px).
+ * NOTE: If replacing the image, update width/height to match the actual dimensions.
+ */
+export const DEFAULT_OG_IMAGE = {
+  path: '/brand/og-default.png',
+  width: 1200,
+  height: 630,
+} as const;
+
+/**
+ * Get the site URL with fallback for local development.
+ * Uses Astro's SITE env variable from astro.config.mjs.
+ * Fails fast in production to prevent broken SEO.
+ */
+let siteUrlDevWarnShown = false;
+export const getSiteUrl = (): string => {
+  const site = import.meta.env.SITE;
+  if (!site) {
+    if (import.meta.env.PROD) {
+      throw new Error(
+        '[SEO] SITE URL must be configured in astro.config.mjs for production builds',
+      );
+    }
+    if (!siteUrlDevWarnShown) {
+      console.warn('[SEO] SITE URL not configured, using localhost fallback for development');
+      siteUrlDevWarnShown = true;
+    }
+    return 'http://localhost:4321';
+  }
+  return site;
+};
+
+/**
+ * Logo image for JSON-LD structured data (relative to site root).
+ * Google recommends a logo with width ≥112px and aspect ratio close to 1:1.
+ * Uses the 512x512 Android Chrome icon as a suitable square logo.
+ */
+export const LOGO_IMAGE = '/android-chrome-512x512.png';
 
 /** Tag used to mark projects as featured on the homepage */
 export const FEATURED_TAG = 'featured' as const;
