@@ -39,6 +39,11 @@ const sizeClasses = {
 const sizeClass = sizeClasses[size];
 const iconPath = icons[name];
 
+// Runtime validation in development mode
+if (import.meta.env.DEV && !iconPath) {
+  console.warn(`[Icon] Unknown icon name: "${name}". Available icons: ${Object.keys(icons).join(', ')}`);
+}
+
 // Icons that use fill instead of stroke
 const filledIcons: IconName[] = ['quote', 'star', 'github'];
 const isFilled = filled || filledIcons.includes(name);

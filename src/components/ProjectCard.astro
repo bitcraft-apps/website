@@ -30,8 +30,11 @@ const formattedDate = pubDate.toLocaleDateString('en-US', {
         <img
           src={image}
           alt={`${title} project thumbnail`}
+          width="400"
+          height="208"
           class="w-full h-52 object-cover transform group-hover:scale-105 transition-transform duration-500"
           loading="lazy"
+          decoding="async"
         />
       </a>
     ) : (

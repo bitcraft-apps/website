@@ -6,19 +6,7 @@
  */
 import Logo from './Logo.astro';
 import { NAV_ITEMS, CONTACT } from '../consts';
-
-/**
- * Check if a nav item is active based on current pathname
- * - Home ("/") requires exact match
- * - Other routes match if pathname starts with the href
- */
-function isActive(href: string, pathname: string): boolean {
-  const normalizedPath = pathname.replace(/\/$/, '') || '/';
-  if (href === '/') {
-    return normalizedPath === '/';
-  }
-  return normalizedPath === href || normalizedPath.startsWith(`${href}/`);
-}
+import { isActive } from '../utils/navigation';
 
 const currentPath = Astro.url.pathname;
 

@@ -6,19 +6,7 @@
  */
 import Logo from './Logo.astro';
 import { NAV_ITEMS } from '../consts';
-
-/**
- * Check if a nav item is active based on current pathname
- * - Home ("/") requires exact match
- * - Other routes match if pathname starts with the href
- */
-function isActive(href: string, pathname: string): boolean {
-  const normalizedPath = pathname.replace(/\/$/, '') || '/';
-  if (href === '/') {
-    return normalizedPath === '/';
-  }
-  return normalizedPath === href || normalizedPath.startsWith(`${href}/`);
-}
+import { isActive } from '../utils/navigation';
 
 const currentPath = Astro.url.pathname;
 ---
@@ -143,7 +131,6 @@ const currentPath = Astro.url.pathname;
 
     const hamburgerIcon = button.querySelector('.hamburger-icon') as HTMLElement | null;
     const closeIcon = button.querySelector('.close-icon') as HTMLElement | null;
-    const mobileLinks = menu.querySelectorAll('.mobile-nav-link');
 
     if (!hamburgerIcon || !closeIcon) return;
 
@@ -198,11 +185,13 @@ const currentPath = Astro.url.pathname;
     // Toggle on button click
     button.addEventListener('click', toggleMenu);
 
-    // Close menu when clicking a link (for SPA-like behavior)
-    mobileLinks.forEach((link) => {
-      link.addEventListener('click', () => {
+    // Close menu when clicking a link using event delegation
+    // This prevents listener accumulation on View Transitions
+    menu.addEventListener('click', (event) => {
+      const target = event.target as HTMLElement;
+      if (target.closest('.mobile-nav-link')) {
         closeMenu();
-      });
+      }
     });
 
     // Register document-level listeners only once to prevent accumulation

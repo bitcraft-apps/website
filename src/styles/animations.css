@@ -86,22 +86,22 @@
 }
 
 /* Animation utility classes */
+/* Note: will-change is intentionally omitted for long-running animations
+   to avoid persistent compositor layers and excessive GPU memory usage.
+   The browser optimizes these animations automatically. */
 .animate-float-slow {
   animation: float-slow var(--bitcraft-animation-duration-float-slow, 8s)
     var(--bitcraft-animation-ease-default, ease-in-out) infinite;
-  will-change: transform;
 }
 
 .animate-float-medium {
   animation: float-medium var(--bitcraft-animation-duration-float-medium, 6s)
     var(--bitcraft-animation-ease-default, ease-in-out) infinite;
-  will-change: transform;
 }
 
 .animate-float-reverse {
   animation: float-reverse var(--bitcraft-animation-duration-float-fast, 7s)
     var(--bitcraft-animation-ease-default, ease-in-out) infinite;
-  will-change: transform;
 }
 
 .animate-fade-in-up {
@@ -121,7 +121,6 @@
 .animate-pulse-slow {
   animation: pulse-slow var(--bitcraft-animation-duration-pulse, 8s)
     var(--bitcraft-animation-ease-default, ease-in-out) infinite;
-  will-change: transform, opacity;
 }
 
 .animate-bounce-slow {
@@ -167,5 +166,6 @@
   .animate-fade-in-slow {
     animation: none;
     opacity: 1;
+    transform: none;
   }
 }

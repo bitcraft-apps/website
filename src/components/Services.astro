@@ -3,9 +3,15 @@
  * Services component - displays "What We Do" section with enhanced service cards
  * Features hover effects, icon backgrounds, and entrance animations
  */
-import Icon from './Icon.astro';
+import Icon, { type IconName } from './Icon.astro';
 
-const services = [
+interface Service {
+  title: string;
+  description: string;
+  iconId: IconName;
+}
+
+const services: Service[] = [
   {
     title: 'Web Development',
     description:
