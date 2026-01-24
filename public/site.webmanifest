@@ -1,4 +1,5 @@
 {
+  "$comment": "theme_color must match BRAND_COLOR in src/consts.ts - keep in sync if changed",
   "name": "Bitcraft",
   "short_name": "Bitcraft",
   "icons": [

@@ -12,14 +12,14 @@ const { title, description, image = DEFAULT_OG_IMAGE } = Astro.props;
 // Use Astro's site config with fallback for local development
 const siteUrl = import.meta.env.SITE || 'http://localhost:4321';
 
-// Warn if site URL is missing in production (would break SEO)
+// Fail build if site URL is missing in production (would break SEO)
 if (!import.meta.env.SITE && import.meta.env.PROD) {
-  console.warn('⚠️ No site URL configured in astro.config.mjs - SEO tags will use localhost');
+  throw new Error('SITE URL must be configured in astro.config.mjs for production builds');
 }
 const canonicalURL = new URL(Astro.url.pathname, siteUrl).href;
 const ogImageURL = new URL(image, siteUrl).href;
 
-// JSON-LD structured data for Organization and WebSite
+// JSON-LD structured data for Organization, WebSite, and WebPage
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -37,6 +37,14 @@ const jsonLd = {
       url: siteUrl,
       name: SITE_TITLE,
       publisher: { '@id': `${siteUrl}/#organization` },
+    },
+    {
+      '@type': 'WebPage',
+      '@id': canonicalURL,
+      url: canonicalURL,
+      name: title,
+      description: description,
+      isPartOf: { '@id': `${siteUrl}/#website` },
     },
   ],
 };
