@@ -1,7 +1,7 @@
 ---
 title: Trening dla Zdrowia
 description: Personal trainer landing page for Wojciech Rokita, featuring training programs and client booking.
-pubDate: 2025-01-24
+pubDate: 2026-01-24
 repository: https://github.com/bitcraft-apps/trening-dla-zdrowia
 tags:
   - Landing Page

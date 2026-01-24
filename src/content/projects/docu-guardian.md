@@ -1,7 +1,7 @@
 ---
 title: DocuGuardian
 description: Intelligent document management app for organizing personal documents with automated expiry detection and reminder system.
-pubDate: 2025-01-09
+pubDate: 2026-01-09
 repository: https://github.com/bitcraft-apps/docu-guardian
 tags:
   - Swift
