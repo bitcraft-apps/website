@@ -4,29 +4,32 @@
  */
 const values = [
   {
-    title: "Quality Craftsmanship",
+    title: 'Quality Craftsmanship',
     description:
-      "We sweat the details. From architecture to UI, we build with care and pride. Every project gets our full attention.",
-    iconId: "sparkles",
+      'We sweat the details. From architecture to UI, we build with care and pride. Every project gets our full attention.',
+    iconId: 'sparkles',
   },
   {
-    title: "Long-term Thinking",
+    title: 'Long-term Thinking',
     description:
-      "We design systems that scale, not quick fixes that become tech debt. Your software should grow with your business.",
-    iconId: "clock",
+      'We design systems that scale, not quick fixes that become tech debt. Your software should grow with your business.',
+    iconId: 'clock',
   },
   {
-    title: "Collaboration",
+    title: 'Collaboration',
     description:
       "We work with you, not just for you. Your success is our success. We're partners in building something great.",
-    iconId: "users",
+    iconId: 'users',
   },
 ];
 ---
 
 <section aria-labelledby="values-heading" class="py-16 sm:py-20 bg-off-white">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h2 id="values-heading" class="text-3xl sm:text-4xl font-semibold text-dark-olive mb-12 text-center">
+    <h2
+      id="values-heading"
+      class="text-3xl sm:text-4xl font-semibold text-dark-olive mb-12 text-center"
+    >
       What We Believe
     </h2>
 
@@ -35,7 +38,7 @@ const values = [
         values.map(({ title, description, iconId }) => (
           <article class="bg-white rounded-lg p-8 border border-olive-drab/20">
             <div class="w-12 h-12 text-forest-green mb-5">
-              {iconId === "sparkles" && (
+              {iconId === 'sparkles' && (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -52,7 +55,7 @@ const values = [
                   />
                 </svg>
               )}
-              {iconId === "clock" && (
+              {iconId === 'clock' && (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -69,7 +72,7 @@ const values = [
                   />
                 </svg>
               )}
-              {iconId === "users" && (
+              {iconId === 'users' && (
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"

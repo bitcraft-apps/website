@@ -14,3 +14,24 @@ export const NAV_ITEMS: NavItem[] = [
   { href: '/projects', label: 'Projects' },
   { href: '/contact', label: 'Contact' },
 ];
+
+// Founder / Owner information
+export const FOUNDER = {
+  name: 'Szymon Graczyk',
+  initials: 'SG',
+  role: 'Founder & Lead Engineer',
+  quote:
+    'We treat every line of code as a piece of craftsmanship, because we believe the details matter.',
+} as const;
+
+// Contact information
+export const CONTACT = {
+  email: 'szymon@graczyk.dev', // temporary
+  github: 'https://github.com/bitcraft-apps',
+} as const;
+
+// Business / Legal information
+export const LEGAL = {
+  taxId: 'PL6422997504',
+  registryUrl: 'https://aplikacja.ceidg.gov.pl/CEIDG/CEIDG.Public.UI/Search.aspx',
+} as const;

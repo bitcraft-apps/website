@@ -3,6 +3,7 @@
  * ContactCTA component - Centered card encouraging visitors to get in touch
  * Used as final section on homepage
  */
+import { CONTACT } from '../consts';
 ---
 
 <section
@@ -84,10 +85,10 @@
         <p class="mt-6 text-sm text-olive-drab">
           Or email us directly at{' '}
           <a
-            href="mailto:hello@bitcraft.dev"
+            href={`mailto:${CONTACT.email}`}
             class="text-forest-green hover:text-dark-olive underline transition-colors"
           >
-            hello@bitcraft.dev
+            {CONTACT.email}
           </a>
         </p>
       </div>

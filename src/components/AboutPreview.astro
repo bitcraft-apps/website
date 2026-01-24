@@ -3,12 +3,10 @@
  * AboutPreview component - Homepage section with company overview and founder highlight
  * Two-column layout that stacks on mobile
  */
+import { FOUNDER } from '../consts';
 ---
 
-<section
-  aria-labelledby="about-preview-heading"
-  class="py-16 sm:py-20 bg-gradient-to-b from-white to-off-white"
->
+<section aria-labelledby="about-preview-heading" class="py-16 sm:py-20">
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
     <!-- Company Overview -->
     <div>
@@ -80,20 +78,19 @@
             <div
               class="w-20 h-20 rounded-full bg-gradient-to-br from-forest-green/20 to-olive-drab/20 flex items-center justify-center border-2 border-white shadow-lg"
             >
-              <span class="text-2xl font-bold text-dark-olive">SG</span>
+              <span class="text-2xl font-bold text-dark-olive">{FOUNDER.initials}</span>
             </div>
           </div>
 
           <!-- Founder Info -->
           <div class="flex-1">
             <blockquote class="text-near-black/80 leading-relaxed mb-4">
-              "We treat every line of code as a piece of craftsmanship, because we believe the
-              details matter."
+              "{FOUNDER.quote}"
             </blockquote>
 
             <div>
-              <div class="font-semibold text-dark-olive">Stefan Graczyk</div>
-              <div class="text-olive-drab text-sm">Founder & Lead Engineer</div>
+              <div class="font-semibold text-dark-olive">{FOUNDER.name}</div>
+              <div class="text-olive-drab text-sm">{FOUNDER.role}</div>
             </div>
           </div>
         </div>
