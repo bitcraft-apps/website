@@ -1,12 +1,23 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import Hero from "../components/Hero.astro";
-import Services from "../components/Services.astro";
-import FeaturedProjects from "../components/FeaturedProjects.astro";
+/**
+ * Homepage - Main landing page for Bitcraft
+ * Sections: Hero, Services, Featured Projects, About Preview, Contact CTA
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import Services from '../components/Services.astro';
+import FeaturedProjects from '../components/FeaturedProjects.astro';
+import AboutPreview from '../components/AboutPreview.astro';
+import ContactCTA from '../components/ContactCTA.astro';
 ---
 
-<BaseLayout title="Bitcraft">
+<BaseLayout
+  title="Bitcraft"
+  description="We build thoughtful web experiences and tools that blend technical precision with creative craft."
+>
   <Hero slot="fullWidth" />
   <Services />
   <FeaturedProjects />
+  <AboutPreview />
+  <ContactCTA slot="fullWidth" />
 </BaseLayout>
