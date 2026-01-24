@@ -10,7 +10,7 @@ const projects = defineCollection({
     repository: z.string().url().optional(),
     image: z.string().min(1).optional(),
     tags: z.array(z.string()).optional(),
-    status: z.enum(['released', 'in-progress']).optional().default('released'),
+    status: z.enum(['released', 'in-progress']).default('released'),
   }),
 });
 

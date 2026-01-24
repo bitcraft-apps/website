@@ -5,7 +5,7 @@
  */
 import type { CollectionEntry } from 'astro:content';
 import Icon from './Icon.astro';
-import { FEATURED_TAG } from '../consts';
+import { getDisplayTags } from '../consts';
 
 interface Props {
   project: CollectionEntry<'projects'>;
@@ -23,8 +23,7 @@ const formattedDate = pubDate.toLocaleDateString('en-US', {
   day: 'numeric',
 });
 
-// Filter out 'featured' tag to avoid displaying it (it's used for filtering, not display)
-const displayTags = tags?.filter((tag) => tag !== FEATURED_TAG) ?? [];
+const displayTags = getDisplayTags(tags);
 ---
 
 <article

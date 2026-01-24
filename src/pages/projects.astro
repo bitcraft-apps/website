@@ -20,16 +20,18 @@ const sortedProjects = [...projects].sort(
         <code class="text-sm font-mono text-dark-olive">Coming soon...</code>
       </div>
     ) : (
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+      <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8" role="list">
         {/* Priority loading for first 3 projects (first row on desktop) for LCP optimization */}
         {sortedProjects.map((project, index) => (
-          <ProjectCard
-            project={project}
-            featured={project.data.tags?.includes(FEATURED_TAG)}
-            priority={index < 3}
-          />
+          <li>
+            <ProjectCard
+              project={project}
+              featured={project.data.tags?.includes(FEATURED_TAG)}
+              priority={index < 3}
+            />
+          </li>
         ))}
-      </div>
+      </ul>
     )
   }
 </BaseLayout>
