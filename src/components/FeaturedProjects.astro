@@ -1,38 +1,51 @@
 ---
 /**
  * FeaturedProjects component for displaying featured projects on the homepage
- * Filters projects by the 'featured' tag and displays up to 3 in a vertical list
+ * Enhanced with grid layout and improved visual presentation
  */
-import { getCollection } from "astro:content";
-import ProjectCard from "./ProjectCard.astro";
+import { getCollection } from 'astro:content';
+import ProjectCard from './ProjectCard.astro';
+import Icon from './Icon.astro';
+import { FEATURED_TAG, MAX_FEATURED_PROJECTS } from '../consts';
 
-const projects = await getCollection("projects");
+const projects = await getCollection('projects');
 
 // Filter projects that have the 'featured' tag
 const featuredProjects = projects
-  .filter((project) => project.data.tags?.includes("featured"))
+  .filter((project) => project.data.tags?.includes(FEATURED_TAG))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 3);
+  .slice(0, MAX_FEATURED_PROJECTS);
 ---
 
-{featuredProjects.length > 0 && (
-  <section aria-labelledby="featured-projects-heading" class="mt-12">
-    <div class="flex justify-between items-center mb-6">
-      <h2 id="featured-projects-heading" class="text-2xl font-bold text-dark-olive">Featured Projects</h2>
-      <a
-        href="/projects"
-        class="text-olive-drab hover:text-forest-green transition-colors"
-      >
-        View all projects &rarr;
-      </a>
-    </div>
+{
+  featuredProjects.length > 0 && (
+    <section aria-labelledby="featured-projects-heading" class="py-16 sm:py-20">
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-10">
+        <div>
+          <h2
+            id="featured-projects-heading"
+            class="text-3xl sm:text-4xl font-bold text-dark-olive mb-2"
+          >
+            Featured Projects
+          </h2>
+          <p class="text-near-black/70 text-lg max-w-xl">
+            A selection of our recent work showcasing what we do best.
+          </p>
+        </div>
+        <a
+          href="/projects"
+          class="group inline-flex items-center gap-2 text-forest-green hover:text-dark-olive font-medium transition-colors whitespace-nowrap"
+        >
+          View all projects
+          <Icon name="arrow-right" size="sm" class="group-hover:translate-x-1 transition-transform" />
+        </a>
+      </div>
 
-    <ul class="space-y-6">
-      {featuredProjects.map((project) => (
-        <li>
-          <ProjectCard project={project} />
-        </li>
-      ))}
-    </ul>
-  </section>
-)}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        {featuredProjects.map((project, index) => (
+          <ProjectCard project={project} featured={true} priority={index === 0} />
+        ))}
+      </div>
+    </section>
+  )
+}

@@ -1,93 +1,71 @@
 ---
 /**
- * Services component - displays "What We Do" section with service cards
+ * Services component - displays "What We Do" section with enhanced service cards
+ * Features hover effects, icon backgrounds, and entrance animations
  */
-const services = [
+import Icon, { type IconName } from './Icon.astro';
+
+interface Service {
+  title: string;
+  description: string;
+  iconId: IconName;
+}
+
+const services: Service[] = [
   {
-    title: "Web Development",
+    title: 'Web Development',
     description:
-      "Custom websites and web applications built with modern frameworks like Astro, React, and Next.js. Fast, accessible, and designed to scale.",
-    iconId: "code-bracket",
+      'Custom websites and web applications built with modern frameworks like Astro, React, and Next.js. Fast, accessible, and designed to scale.',
+    iconId: 'code-bracket',
   },
   {
-    title: "Digital Products",
+    title: 'Digital Products',
     description:
-      "End-to-end product development—from concept to launch. We build tools and platforms that solve real problems.",
-    iconId: "square-3-stack-3d",
+      'End-to-end product development—from concept to launch. We build tools and platforms that solve real problems.',
+    iconId: 'square-3-stack-3d',
   },
   {
-    title: "Technical Consulting",
+    title: 'Technical Consulting',
     description:
-      "Strategic guidance on architecture, performance optimization, and technology decisions. We help teams build better.",
-    iconId: "light-bulb",
+      'Strategic guidance on architecture, performance optimization, and technology decisions. We help teams build better.',
+    iconId: 'light-bulb',
   },
 ];
 ---
 
-<section aria-labelledby="services-heading" class="mt-12">
-  <h2 id="services-heading" class="text-2xl font-bold text-dark-olive mb-6">
-    What We Do
-  </h2>
+<section aria-labelledby="services-heading" class="py-16 sm:py-20">
+  <div class="text-center mb-12">
+    <h2 id="services-heading" class="text-3xl sm:text-4xl font-bold text-dark-olive mb-4">
+      What We Do
+    </h2>
+    <p class="text-near-black/70 max-w-2xl mx-auto text-lg">
+      We partner with startups and businesses to build software that makes a difference.
+    </p>
+  </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
     {
       services.map(({ title, description, iconId }) => (
-        <article class="bg-off-white rounded-lg p-6 border border-olive-drab/20">
-          <div class="w-12 h-12 text-forest-green mb-4">
-            {iconId === "code-bracket" && (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-12 h-12"
-                aria-hidden="true"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5"
-                />
-              </svg>
-            )}
-            {iconId === "square-3-stack-3d" && (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-12 h-12"
-                aria-hidden="true"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M6.429 9.75 2.25 12l4.179 2.25m0-4.5 5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0 4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0-5.571 3-5.571-3"
-                />
-              </svg>
-            )}
-            {iconId === "light-bulb" && (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                class="w-12 h-12"
-                aria-hidden="true"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"
-                />
-              </svg>
-            )}
+        <article
+          class="group relative bg-white rounded-xl p-8 border border-olive-drab/10 shadow-sm hover:shadow-xl hover:shadow-forest-green/10 hover:border-forest-green/30 transform hover:-translate-y-1 transition-all duration-300"
+        >
+          {/* Icon with background */}
+          <div class="w-14 h-14 mb-6 rounded-xl bg-gradient-to-br from-forest-green/10 to-olive-drab/10 flex items-center justify-center group-hover:from-forest-green/20 group-hover:to-olive-drab/20 transition-all duration-300">
+            <div class="w-8 h-8 text-forest-green group-hover:scale-110 transition-transform duration-300">
+              <Icon name={iconId} size="md" />
+            </div>
           </div>
-          <h3 class="text-xl font-semibold text-dark-olive mb-3">{title}</h3>
-          <p class="text-near-black leading-relaxed">{description}</p>
+
+          {/* Content */}
+          <h3 class="text-xl font-semibold text-dark-olive mb-3 group-hover:text-forest-green transition-colors duration-300">
+            {title}
+          </h3>
+          <p class="text-near-black/70 leading-relaxed">{description}</p>
+
+          {/* Decorative corner accent */}
+          <div class="absolute top-0 right-0 w-16 h-16 overflow-hidden rounded-tr-xl">
+            <div class="absolute top-0 right-0 w-24 h-24 -translate-y-12 translate-x-12 bg-gradient-to-bl from-forest-green/5 to-transparent transform rotate-45 group-hover:from-forest-green/10 transition-all duration-300" />
+          </div>
         </article>
       ))
     }

@@ -1,0 +1,105 @@
+---
+/**
+ * AboutPreview component - Homepage section with company overview and founder highlight
+ * Two-column layout that stacks on mobile
+ */
+import { FOUNDER } from '../consts';
+import Icon from './Icon.astro';
+---
+
+<section aria-labelledby="about-preview-heading" class="py-16 sm:py-20">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+    <!-- Company Overview -->
+    <div>
+      <div
+        class="inline-flex items-center gap-2 px-3 py-1.5 mb-6 bg-olive-drab/10 rounded-full text-olive-drab text-sm font-medium"
+      >
+        About Us
+      </div>
+
+      <h2 id="about-preview-heading" class="text-3xl sm:text-4xl font-bold text-dark-olive mb-6">
+        We build digital products that last.
+      </h2>
+
+      <div class="space-y-4 text-near-black/80 leading-relaxed text-lg">
+        <p>
+          Bitcraft is a software studio helping startups and businesses bring ideas to life through
+          thoughtful engineering. We believe software should be <span
+            class="text-dark-olive font-medium">crafted</span
+          >, not just coded.
+        </p>
+        <p>
+          Founded by industry veterans, we partner with teams who value quality, think long-term,
+          and want a genuine partner in their journey.
+        </p>
+      </div>
+
+      <a
+        href="/about"
+        class="group inline-flex items-center gap-2 mt-8 text-forest-green hover:text-dark-olive font-semibold transition-colors"
+      >
+        Learn more about us
+        <Icon name="arrow-right" size="sm" class="group-hover:translate-x-1 transition-transform" />
+      </a>
+    </div>
+
+    <!-- Founder Card -->
+    <div class="relative">
+      <div
+        class="bg-white rounded-2xl p-8 shadow-lg shadow-olive-drab/5 border border-olive-drab/10"
+      >
+        <!-- Decorative quote mark -->
+        <div
+          class="absolute -top-4 -left-4 w-12 h-12 bg-forest-green/10 rounded-full flex items-center justify-center"
+        >
+          <Icon name="quote" size="md" class="text-forest-green" />
+        </div>
+
+        <div class="flex items-start gap-6">
+          <!-- Founder Photo Placeholder -->
+          <div class="flex-shrink-0">
+            <div
+              class="w-20 h-20 rounded-full bg-gradient-to-br from-forest-green/20 to-olive-drab/20 flex items-center justify-center border-2 border-white shadow-lg"
+            >
+              <span class="text-2xl font-bold text-dark-olive">{FOUNDER.initials}</span>
+            </div>
+          </div>
+
+          <!-- Founder Info -->
+          <figure class="flex-1">
+            <blockquote class="text-near-black/80 leading-relaxed mb-4">
+              "{FOUNDER.quote}"
+            </blockquote>
+
+            <figcaption>
+              <strong class="font-semibold text-dark-olive">{FOUNDER.name}</strong>
+              <div class="text-olive-drab text-sm">{FOUNDER.role}</div>
+            </figcaption>
+          </figure>
+        </div>
+
+        <!-- Background decoration -->
+        <div
+          class="absolute bottom-0 right-0 w-32 h-32 overflow-hidden rounded-br-2xl pointer-events-none"
+        >
+          <div
+            class="absolute bottom-0 right-0 w-48 h-48 translate-y-16 translate-x-16 bg-gradient-to-tl from-forest-green/5 to-transparent rounded-full"
+          >
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating accent elements -->
+      <div
+        class="absolute -bottom-4 -right-4 w-24 h-24 bg-olive-drab/5 rounded-xl -z-10"
+        aria-hidden="true"
+      >
+      </div>
+      <div
+        class="absolute -top-2 -right-2 w-16 h-16 bg-forest-green/5 rounded-lg -z-10"
+        aria-hidden="true"
+      >
+      </div>
+    </div>
+  </div>
+</section>

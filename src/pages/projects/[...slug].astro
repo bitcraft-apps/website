@@ -1,9 +1,9 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getCollection, render } from "astro:content";
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
-  const projects = await getCollection("projects");
+  const projects = await getCollection('projects');
   return projects.map((project) => ({
     params: { slug: project.id },
     props: { project },
@@ -24,22 +24,26 @@ const { Content } = await render(project);
       <p class="text-lg text-near-black mb-4">{project.data.description}</p>
       <div class="flex items-center gap-4 text-sm text-olive-drab">
         <time datetime={project.data.pubDate.toISOString()}>
-          {project.data.pubDate.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
+          {
+            project.data.pubDate.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })
+          }
         </time>
-        {project.data.repository && (
-          <a
-            href={project.data.repository}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="hover:text-dark-olive underline"
-          >
-            Repository
-          </a>
-        )}
+        {
+          project.data.repository && (
+            <a
+              href={project.data.repository}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="hover:text-dark-olive underline"
+            >
+              Repository
+            </a>
+          )
+        }
       </div>
     </header>
     <div class="prose prose-olive max-w-none">
