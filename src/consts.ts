@@ -1,6 +1,3 @@
-// Place any global data in this file.
-// You can import this data from anywhere in your site by using the `import` keyword.
-
 export const SITE_TITLE = 'Bitcraft';
 export const SITE_DESCRIPTION = 'Bitcraft — web experiences and tools for Bitcraft and beyond.';
 
@@ -25,13 +22,20 @@ export const DEFAULT_OG_IMAGE = {
 /**
  * Get the site URL with fallback for local development.
  * Uses Astro's SITE env variable from astro.config.mjs.
+ * Fails fast in production to prevent broken SEO.
  */
 export const getSiteUrl = (): string => {
   const site = import.meta.env.SITE;
-  if (!site && import.meta.env.DEV) {
-    console.warn('[SEO] SITE URL not configured in astro.config.mjs, using localhost fallback');
+  if (!site) {
+    if (import.meta.env.PROD) {
+      throw new Error(
+        '[SEO] SITE URL must be configured in astro.config.mjs for production builds',
+      );
+    }
+    console.warn('[SEO] SITE URL not configured, using localhost fallback for development');
+    return 'http://localhost:4321';
   }
-  return site || 'http://localhost:4321';
+  return site;
 };
 
 /**
