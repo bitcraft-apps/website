@@ -1,7 +1,7 @@
 ---
 title: Claude Spec-First Framework
 description: Minimalist development workflow for Claude Code following YAGNI, KISS, and SRP principles. Build the smallest thing that works.
-pubDate: 2025-08-22
+pubDate: 2025-09-24
 repository: https://github.com/bitcraft-apps/claude-spec-first
 tags:
   - featured
