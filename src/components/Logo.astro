@@ -4,7 +4,7 @@
  * - 'default': Original color logo
  * - 'mono-white': White logo for dark backgrounds
  * - 'mono-black': Black logo for light backgrounds
- * - 'auto': Automatically switches between mono-black (light mode) and mono-white (dark mode)
+ * - 'auto': Uses mono-black with CSS invert filter in dark mode (single image, better LCP)
  */
 interface Props {
   variant?: 'default' | 'mono-white' | 'mono-black' | 'auto';
@@ -25,25 +25,10 @@ const isAuto = variant === 'auto';
 const src = isAuto ? logoMap['mono-black'] : logoMap[variant];
 ---
 
-{isAuto ? (
-  <>
-    {/* Light mode: show mono-black logo */}
-    <img
-      src={logoMap['mono-black']}
-      alt="Bitcraft Logo"
-      class:list={[className, 'dark:hidden']}
-      width={width}
-      height={height}
-    />
-    {/* Dark mode: show mono-white logo */}
-    <img
-      src={logoMap['mono-white']}
-      alt="Bitcraft Logo"
-      class:list={[className, 'hidden dark:block']}
-      width={width}
-      height={height}
-    />
-  </>
-) : (
-  <img src={src} alt="Bitcraft Logo" class={className} width={width} height={height} />
-)}
+<img
+  src={src}
+  alt="Bitcraft Logo"
+  class:list={[className, isAuto && 'dark:invert']}
+  width={width}
+  height={height}
+/>
