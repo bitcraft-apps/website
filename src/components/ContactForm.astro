@@ -32,7 +32,7 @@ const uniqueId = `cf-${Math.random().toString(36).slice(2, 9)}`;
   data-contact-form
   action={formAction}
   method="POST"
-  class="space-y-6"
+  class="relative space-y-6"
   novalidate
 >
   <!-- Name Field -->
@@ -362,6 +362,13 @@ const uniqueId = `cf-${Math.random().toString(36).slice(2, 9)}`;
         formData.append('name', elements.nameInput.value.trim());
         formData.append('email', elements.emailInput.value.trim());
         formData.append('message', elements.messageInput.value.trim());
+
+        // Include honeypot field for Formspree spam filtering
+        const honeypotInput = form.querySelector<HTMLInputElement>('[data-field="honeypot"]');
+        if (honeypotInput) {
+          formData.append('_gotcha', honeypotInput.value);
+        }
+
         return formData;
       }
 
