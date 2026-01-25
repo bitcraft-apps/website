@@ -23,6 +23,7 @@ const formattedDate = pubDate.toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'long',
   day: 'numeric',
+  timeZone: 'UTC',
 });
 
 const displayTags = getDisplayTags(tags);
@@ -36,6 +37,7 @@ const displayTags = getDisplayTags(tags);
         <img
           src={image}
           alt=""
+          role="presentation"
           class="w-full h-full object-cover"
           loading="eager"
           decoding="async"
@@ -88,7 +90,7 @@ const displayTags = getDisplayTags(tags);
                 : 'bg-olive-drab/10 text-olive-drab',
             ]}
           >
-            <Icon name="clock" class="w-3.5 h-3.5" />
+            <Icon name="clock" size="2xs" />
             In Progress
           </span>
         </div>
@@ -150,7 +152,7 @@ const displayTags = getDisplayTags(tags);
     {
       repository && (
         <div class="flex flex-wrap gap-4">
-          <Button href={repository} variant="primary" icon="github">
+          <Button href={repository} variant="primary" icon="github" external>
             View Repository
           </Button>
         </div>

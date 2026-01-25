@@ -88,6 +88,10 @@
   /**
    * Prose styles for markdown content.
    * Custom implementation for Tailwind v4 (no typography plugin).
+   *
+   * Note: Neutral grays (#e5e7eb, #6b7280, etc.) are hardcoded Tailwind gray values
+   * used for borders, captions, and backgrounds. These intentionally differ from
+   * brand colors to provide neutral UI elements that don't compete with content.
    */
   .prose {
     --prose-body: var(--bitcraft-color-neutral-near-black);
@@ -106,7 +110,20 @@
     color: var(--prose-body);
     line-height: 1.75;
 
-    /* Headings */
+    /*
+     * Headings
+     * Note: h1 is styled for completeness, though project pages render
+     * the title separately in ProjectHero. Markdown content should use h2+.
+     */
+    & h1 {
+      color: var(--prose-headings);
+      font-weight: 700;
+      font-size: 2rem;
+      margin-top: 0;
+      margin-bottom: 1.25rem;
+      line-height: 1.2;
+    }
+
     & h2 {
       color: var(--prose-headings);
       font-weight: 600;
@@ -248,18 +265,23 @@
       margin-bottom: 2.5rem;
     }
 
-    /* Tables */
+    /* Tables - wrapped for mobile overflow */
     & table {
+      display: block;
       width: 100%;
-      table-layout: auto;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
       margin-top: 2rem;
       margin-bottom: 2rem;
-      border-collapse: collapse;
       font-size: 0.9375rem;
     }
 
     & thead {
       border-bottom: 2px solid var(--prose-th-borders);
+    }
+
+    & tbody {
+      border-collapse: collapse;
     }
 
     & thead th {

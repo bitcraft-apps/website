@@ -14,6 +14,8 @@ interface Props {
   icon?: IconName;
   /** Icon hover animation */
   iconAnimation?: 'translate-x' | 'rotate' | 'none';
+  /** Open link in new tab (adds target="_blank" and rel="noopener noreferrer") */
+  external?: boolean;
   /** Additional CSS classes */
   class?: string;
 }
@@ -23,6 +25,7 @@ const {
   variant = 'primary',
   icon,
   iconAnimation = 'translate-x',
+  external = false,
   class: className = '',
 } = Astro.props;
 
@@ -46,9 +49,10 @@ const classes = [baseClasses, variantClasses[variant], className].join(' ');
 const iconClasses = `transition-transform duration-300 ${iconAnimationClasses[iconAnimation]}`;
 
 const Element = href ? 'a' : 'button';
+const externalAttrs = href && external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 ---
 
-<Element href={href} class={classes} {...href ? {} : { type: 'button' }}>
+<Element href={href} class={classes} {...externalAttrs} {...href ? {} : { type: 'button' }}>
   <slot />
   {icon && <Icon name={icon} size="sm" class={iconClasses} aria-hidden="true" />}
 </Element>

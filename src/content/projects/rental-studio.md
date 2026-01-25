@@ -33,11 +33,9 @@ A comprehensive platform for landlords to manage properties and plan renovations
 
 ## Tech Stack
 
-| Component | Technology                        |
-| --------- | --------------------------------- |
-| Runtime   | Bun                               |
-| Backend   | Hono                              |
-| Frontend  | Hono JSX + HTMX                   |
-| Database  | PostgreSQL + Drizzle ORM          |
-| Email     | Resend                            |
-| Hosting   | Hetzner (Docker) + Cloudflare CDN |
+- **Runtime**: Bun
+- **Backend**: Hono
+- **Frontend**: Hono JSX + HTMX
+- **Database**: PostgreSQL + Drizzle ORM
+- **Email**: Resend
+- **Hosting**: Hetzner (Docker) + Cloudflare CDN

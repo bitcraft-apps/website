@@ -29,55 +29,47 @@ if (!prevProject && !nextProject) {
 >
   <div class="flex flex-col sm:flex-row justify-between gap-6">
     {/* Previous project (older) */}
-    <div class="flex-1">
-      {
-        prevProject ? (
-          <a
-            href={`/projects/${prevProject.id}`}
-            class="group flex flex-col gap-1 text-left"
-          >
-            <span class="inline-flex items-center gap-1.5 text-sm text-olive-drab group-hover:text-forest-green transition-colors">
-              <Icon
-                name="arrow-left"
-                size="xs"
-                class="group-hover:-translate-x-1 transition-transform"
-              />
-              Previous
-            </span>
-            <span class="text-dark-olive dark:text-off-white font-medium group-hover:text-forest-green transition-colors line-clamp-1">
-              {prevProject.title}
-            </span>
-          </a>
-        ) : (
-          <div />
-        )
-      }
-    </div>
+    {
+      prevProject && (
+        <a
+          href={`/projects/${prevProject.id}`}
+          class="group flex flex-col gap-1 text-left flex-1"
+        >
+          <span class="inline-flex items-center gap-1.5 text-sm text-olive-drab group-hover:text-forest-green transition-colors">
+            <Icon
+              name="arrow-left"
+              size="xs"
+              class="group-hover:-translate-x-1 transition-transform"
+            />
+            Previous
+          </span>
+          <span class="text-dark-olive dark:text-off-white font-medium group-hover:text-forest-green transition-colors line-clamp-1">
+            {prevProject.title}
+          </span>
+        </a>
+      )
+    }
 
     {/* Next project (newer) */}
-    <div class="flex-1">
-      {
-        nextProject ? (
-          <a
-            href={`/projects/${nextProject.id}`}
-            class="group flex flex-col gap-1 text-right sm:items-end"
-          >
-            <span class="inline-flex items-center gap-1.5 text-sm text-olive-drab group-hover:text-forest-green transition-colors">
-              Next
-              <Icon
-                name="arrow-right"
-                size="xs"
-                class="group-hover:translate-x-1 transition-transform"
-              />
-            </span>
-            <span class="text-dark-olive dark:text-off-white font-medium group-hover:text-forest-green transition-colors line-clamp-1">
-              {nextProject.title}
-            </span>
-          </a>
-        ) : (
-          <div />
-        )
-      }
-    </div>
+    {
+      nextProject && (
+        <a
+          href={`/projects/${nextProject.id}`}
+          class="group flex flex-col gap-1 text-right sm:items-end flex-1 sm:ml-auto"
+        >
+          <span class="inline-flex items-center gap-1.5 text-sm text-olive-drab group-hover:text-forest-green transition-colors">
+            Next
+            <Icon
+              name="arrow-right"
+              size="xs"
+              class="group-hover:translate-x-1 transition-transform"
+            />
+          </span>
+          <span class="text-dark-olive dark:text-off-white font-medium group-hover:text-forest-green transition-colors line-clamp-1">
+            {nextProject.title}
+          </span>
+        </a>
+      )
+    }
   </div>
 </nav>
