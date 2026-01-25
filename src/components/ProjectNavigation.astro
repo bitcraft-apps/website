@@ -1,0 +1,83 @@
+---
+/**
+ * ProjectNavigation component - prev/next navigation for project detail pages
+ * Displays links to adjacent projects based on publication date
+ */
+import Icon from './Icon.astro';
+
+interface ProjectLink {
+  id: string;
+  title: string;
+}
+
+interface Props {
+  prevProject?: ProjectLink | null;
+  nextProject?: ProjectLink | null;
+}
+
+const { prevProject, nextProject } = Astro.props;
+
+// Don't render if no navigation is available
+if (!prevProject && !nextProject) {
+  return null;
+}
+---
+
+<nav
+  aria-label="Project navigation"
+  class="border-t border-olive-drab/20 dark:border-olive-drab/10 pt-8 mt-12"
+>
+  <div class="flex flex-col sm:flex-row justify-between gap-6">
+    {/* Previous project (older) */}
+    <div class="flex-1">
+      {
+        prevProject ? (
+          <a
+            href={`/projects/${prevProject.id}`}
+            class="group flex flex-col gap-1 text-left"
+          >
+            <span class="inline-flex items-center gap-1.5 text-sm text-olive-drab group-hover:text-forest-green transition-colors">
+              <Icon
+                name="arrow-left"
+                size="xs"
+                class="group-hover:-translate-x-1 transition-transform"
+              />
+              Previous
+            </span>
+            <span class="text-dark-olive dark:text-off-white font-medium group-hover:text-forest-green transition-colors line-clamp-1">
+              {prevProject.title}
+            </span>
+          </a>
+        ) : (
+          <div />
+        )
+      }
+    </div>
+
+    {/* Next project (newer) */}
+    <div class="flex-1">
+      {
+        nextProject ? (
+          <a
+            href={`/projects/${nextProject.id}`}
+            class="group flex flex-col gap-1 text-right sm:items-end"
+          >
+            <span class="inline-flex items-center gap-1.5 text-sm text-olive-drab group-hover:text-forest-green transition-colors">
+              Next
+              <Icon
+                name="arrow-right"
+                size="xs"
+                class="group-hover:translate-x-1 transition-transform"
+              />
+            </span>
+            <span class="text-dark-olive dark:text-off-white font-medium group-hover:text-forest-green transition-colors line-clamp-1">
+              {nextProject.title}
+            </span>
+          </a>
+        ) : (
+          <div />
+        )
+      }
+    </div>
+  </div>
+</nav>

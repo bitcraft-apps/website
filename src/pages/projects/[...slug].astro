@@ -1,76 +1,51 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Icon from '../../components/Icon.astro';
+import ProjectHero from '../../components/ProjectHero.astro';
+import ProjectNavigation from '../../components/ProjectNavigation.astro';
 import { getCollection, render } from 'astro:content';
-import { getDisplayTags } from '../../consts';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
-  return projects.map((project) => ({
+  const sorted = [...projects].sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+  );
+
+  return sorted.map((project, index) => ({
     params: { slug: project.id },
-    props: { project },
+    props: {
+      project,
+      // Previous = older (next in sorted array), Next = newer (previous in sorted array)
+      prevProject: sorted[index + 1]
+        ? { id: sorted[index + 1].id, title: sorted[index + 1].data.title }
+        : null,
+      nextProject: sorted[index - 1]
+        ? { id: sorted[index - 1].id, title: sorted[index - 1].data.title }
+        : null,
+    },
   }));
 }
 
-const { project } = Astro.props;
+const { project, prevProject, nextProject } = Astro.props;
 const { Content } = await render(project);
-
-const displayTags = getDisplayTags(project.data.tags);
 ---
 
 <BaseLayout title={`${project.data.title} | Bitcraft`} description={project.data.description}>
-  <article class="max-w-3xl">
-    <header class="mb-8">
-      <a href="/projects" class="text-olive-drab hover:text-dark-olive dark:hover:text-white mb-4 inline-block">
-        &larr; Back to Projects
-      </a>
-      <h1 class="text-4xl font-bold text-dark-olive dark:text-off-white mb-4">{project.data.title}</h1>
-      <p class="text-lg text-near-black dark:text-off-white/80 mb-4">{project.data.description}</p>
-      <div class="flex items-center gap-4 text-sm text-olive-drab">
-        {
-          project.data.status === 'in-progress' && (
-            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-olive-drab/10 text-olive-drab text-xs font-medium rounded-full">
-              <Icon name="clock" class="w-3.5 h-3.5" />
-              In Progress
-            </div>
-          )
-        }
-        <time datetime={project.data.pubDate.toISOString()}>
-          {
-            project.data.pubDate.toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })
-          }
-        </time>
-        {
-          project.data.repository && (
-            <a
-              href={project.data.repository}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="hover:text-dark-olive dark:hover:text-white underline"
-            >
-              Repository
-            </a>
-          )
-        }
-      </div>
-      {
-        displayTags.length > 0 && (
-          <div class="flex flex-wrap gap-2 mt-4">
-            {displayTags.map((tag) => (
-              <span class="text-xs font-medium px-2.5 py-1 rounded-full bg-off-white dark:bg-white/10 text-dark-olive/80 dark:text-off-white/80 border border-olive-drab/10 dark:border-olive-drab/20">
-                {tag}
-              </span>
-            ))}
-          </div>
-        )
-      }
-    </header>
-    <div class="prose prose-olive dark:prose-invert max-w-none">
+  <ProjectHero
+    slot="fullWidth"
+    title={project.data.title}
+    description={project.data.description}
+    image={project.data.image}
+    status={project.data.status}
+    pubDate={project.data.pubDate}
+    repository={project.data.repository}
+    tags={project.data.tags}
+  />
+
+  <article class="max-w-4xl mx-auto">
+    <div class="prose prose-lg max-w-none">
       <Content />
     </div>
+
+    <ProjectNavigation prevProject={prevProject} nextProject={nextProject} />
   </article>
 </BaseLayout>
