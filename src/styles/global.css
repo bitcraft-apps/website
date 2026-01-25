@@ -84,4 +84,302 @@
     flex-direction: column;
     justify-content: center;
   }
+
+  /**
+   * Prose styles for markdown content.
+   * Custom implementation for Tailwind v4 (no typography plugin).
+   *
+   * Note: Neutral grays (#e5e7eb, #6b7280, etc.) are hardcoded Tailwind gray values
+   * used for borders, captions, and backgrounds. These intentionally differ from
+   * brand colors to provide neutral UI elements that don't compete with content.
+   */
+  .prose {
+    --prose-body: var(--bitcraft-color-neutral-near-black);
+    --prose-headings: var(--bitcraft-color-neutral-near-black);
+    --prose-links: var(--bitcraft-color-dark-olive);
+    --prose-bold: var(--bitcraft-color-neutral-near-black);
+    --prose-counters: var(--bitcraft-color-olive-drab);
+    --prose-bullets: var(--bitcraft-color-olive-drab);
+    --prose-hr: #e5e7eb;
+    --prose-quote-borders: var(--bitcraft-color-olive-drab);
+    --prose-captions: #6b7280;
+    --prose-code: var(--bitcraft-color-neutral-near-black);
+    --prose-th-borders: #d1d5db;
+    --prose-td-borders: #e5e7eb;
+
+    color: var(--prose-body);
+    line-height: 1.75;
+
+    /*
+     * Headings
+     * Note: h1 is styled for completeness, though project pages render
+     * the title separately in ProjectHero. Markdown content should use h2+.
+     */
+    & h1 {
+      color: var(--prose-headings);
+      font-weight: 700;
+      font-size: 2rem;
+      margin-top: 0;
+      margin-bottom: 1.25rem;
+      line-height: 1.2;
+    }
+
+    & h2 {
+      color: var(--prose-headings);
+      font-weight: 600;
+      font-size: 1.5rem;
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      line-height: 1.3;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--prose-hr);
+    }
+
+    & h3 {
+      color: var(--prose-headings);
+      font-weight: 600;
+      font-size: 1.25rem;
+      margin-top: 2rem;
+      margin-bottom: 0.75rem;
+      line-height: 1.4;
+    }
+
+    & h4 {
+      color: var(--prose-headings);
+      font-weight: 600;
+      font-size: 1.125rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Paragraphs */
+    & p {
+      margin-top: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    & > :first-child {
+      margin-top: 0;
+    }
+
+    & > :last-child {
+      margin-bottom: 0;
+    }
+
+    /* Links */
+    & a {
+      color: var(--prose-links);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      font-weight: 500;
+
+      &:hover {
+        color: var(--bitcraft-color-olive-drab);
+      }
+    }
+
+    /* Bold */
+    & strong {
+      color: var(--prose-bold);
+      font-weight: 600;
+    }
+
+    /* Lists */
+    & ul {
+      list-style-type: disc;
+      padding-left: 1.5rem;
+      margin-top: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    & ol {
+      list-style-type: decimal;
+      padding-left: 1.5rem;
+      margin-top: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    & li {
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+      padding-left: 0.375rem;
+    }
+
+    & li::marker {
+      color: var(--prose-bullets);
+    }
+
+    & ol > li::marker {
+      color: var(--prose-counters);
+      font-weight: 500;
+    }
+
+    /* Nested lists */
+    & ul ul,
+    & ol ul {
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Code */
+    & code {
+      color: var(--prose-code);
+      font-family: var(--bitcraft-font-mono);
+      font-size: 0.875em;
+      background-color: #f3f4f6;
+      padding: 0.125rem 0.375rem;
+      border-radius: 0.25rem;
+    }
+
+    & pre {
+      background-color: #1f2937;
+      color: #f9fafb;
+      overflow-x: auto;
+      padding: 1rem 1.25rem;
+      border-radius: 0.5rem;
+      margin-top: 1.5rem;
+      margin-bottom: 1.5rem;
+
+      & code {
+        background: transparent;
+        padding: 0;
+        color: inherit;
+        font-size: 0.875rem;
+      }
+    }
+
+    /* Blockquotes */
+    & blockquote {
+      border-left: 4px solid var(--prose-quote-borders);
+      padding-left: 1rem;
+      font-style: italic;
+      margin-top: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: #4b5563;
+    }
+
+    /* Horizontal rule */
+    & hr {
+      border-color: var(--prose-hr);
+      margin-top: 2.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    /* Tables - wrapped for mobile overflow */
+    & table {
+      display: block;
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+      font-size: 0.9375rem;
+    }
+
+    & thead {
+      border-bottom: 2px solid var(--prose-th-borders);
+    }
+
+    & thead th {
+      color: var(--prose-headings);
+      font-weight: 600;
+      padding: 0.75rem 1rem;
+      text-align: left;
+      background-color: #f9fafb;
+    }
+
+    & thead th:first-child {
+      border-radius: 0.375rem 0 0 0;
+    }
+
+    & thead th:last-child {
+      border-radius: 0 0.375rem 0 0;
+    }
+
+    & tbody tr {
+      border-bottom: 1px solid var(--prose-td-borders);
+    }
+
+    & tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    & tbody td {
+      padding: 0.75rem 1rem;
+      vertical-align: top;
+    }
+
+    & tbody tr:nth-child(even) {
+      background-color: #fafafa;
+    }
+
+    /* Images */
+    & img {
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+      border-radius: 0.5rem;
+    }
+
+    /* Figcaption */
+    & figcaption {
+      color: var(--prose-captions);
+      font-size: 0.875rem;
+      margin-top: 0.75rem;
+      text-align: center;
+    }
+  }
+
+  /* Large prose variant */
+  .prose-lg {
+    font-size: 1.125rem;
+    line-height: 1.8;
+
+    & h2 {
+      font-size: 1.75rem;
+    }
+
+    & h3 {
+      font-size: 1.375rem;
+    }
+  }
+
+  /* Dark mode prose */
+  .dark .prose {
+    --prose-body: var(--bitcraft-color-neutral-off-white);
+    --prose-headings: var(--bitcraft-color-neutral-off-white);
+    --prose-links: var(--bitcraft-color-olive-drab);
+    --prose-bold: var(--bitcraft-color-neutral-white);
+    --prose-counters: var(--bitcraft-color-olive-drab);
+    --prose-bullets: var(--bitcraft-color-olive-drab);
+    --prose-hr: #374151;
+    --prose-quote-borders: var(--bitcraft-color-olive-drab);
+    --prose-captions: #9ca3af;
+    --prose-code: var(--bitcraft-color-neutral-off-white);
+    --prose-th-borders: #4b5563;
+    --prose-td-borders: #374151;
+
+    & a:hover {
+      color: var(--bitcraft-color-forest-green);
+    }
+
+    & code {
+      background-color: #374151;
+    }
+
+    & pre {
+      background-color: #111827;
+    }
+
+    & blockquote {
+      color: #d1d5db;
+    }
+
+    & thead th {
+      background-color: #1f2937;
+    }
+
+    & tbody tr:nth-child(even) {
+      background-color: #111827;
+    }
+  }
 }

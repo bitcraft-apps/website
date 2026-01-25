@@ -71,6 +71,18 @@ export const getDisplayTags = (tags?: string[]): string[] =>
 /** Maximum number of featured projects to display on homepage */
 export const MAX_FEATURED_PROJECTS = 3;
 
+/**
+ * Format a date for display (e.g., "January 25, 2026").
+ * Uses UTC timezone to ensure consistent rendering across server/client.
+ */
+export const formatDate = (date: Date): string =>
+  date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
+  });
+
 export interface NavItem {
   href: string;
   label: string;
