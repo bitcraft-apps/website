@@ -15,6 +15,7 @@ concurrency:
 jobs:
   check-and-sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: write
       pull-requests: write
@@ -31,6 +32,7 @@ jobs:
           set -euo pipefail
 
           # Dependencies: jq (pre-installed on ubuntu-latest runners)
+          command -v jq >/dev/null || { echo "Error: jq is required"; exit 1; }
 
           # 1. Get Local Version
           LOCAL_VERSION=$(jq -r .version src/data/brand-version.json)
@@ -73,12 +75,27 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Ensure cleanup on exit (success or failure)
-          # TEMP_VERSION_FILE initialized empty; set via mktemp at line ~179.
-          # Trap evaluates variable at execution time, so cleanup works correctly.
-          # Empty string in rm -rf is safe (no-op).
+          # Track success for conditional cleanup
+          SYNC_SUCCESS=false
           TEMP_VERSION_FILE=""
-          trap 'rm -rf temp-download temp-unzip temp-logo-backup "$TEMP_VERSION_FILE"' EXIT
+
+          # Cleanup function: restores backups on failure, removes temp files always
+          cleanup() {
+            local exit_code=$?
+            if [ "$SYNC_SUCCESS" != "true" ] && [ -d "temp-logo-backup" ]; then
+              echo "Sync failed, restoring backups..."
+              mkdir -p public/brand
+              shopt -s nullglob
+              local backup_files=(temp-logo-backup/*)
+              shopt -u nullglob
+              if [ "${#backup_files[@]}" -gt 0 ]; then
+                mv "${backup_files[@]}" public/brand/ 2>/dev/null || true
+              fi
+            fi
+            rm -rf temp-download temp-unzip temp-logo-backup "$TEMP_VERSION_FILE"
+            exit $exit_code
+          }
+          trap cleanup EXIT
 
           echo "Downloading assets for version $VERSION..."
 
@@ -131,11 +148,18 @@ jobs:
           #     tokens.css
           #     bitcraft-logo*.svg (optional - see bitcraft-brand#32)
 
-          # 1. Move standard web assets to public/ root (using nullglob+array for consistent error handling)
+          # 1. Move standard web assets to public/ root
+          # Build array conditionally to handle both globs and literal filenames
           mkdir -p public
+          WEB_ASSETS=()
           shopt -s nullglob
-          WEB_ASSETS=("$STAGING"/favicon* "$STAGING"/android-chrome* "$STAGING"/apple-touch-icon.png "$STAGING"/site.webmanifest)
+          for f in "$STAGING"/favicon* "$STAGING"/android-chrome*; do
+            WEB_ASSETS+=("$f")
+          done
           shopt -u nullglob
+          # Add literal files only if they exist
+          [ -f "$STAGING/apple-touch-icon.png" ] && WEB_ASSETS+=("$STAGING/apple-touch-icon.png")
+          [ -f "$STAGING/site.webmanifest" ] && WEB_ASSETS+=("$STAGING/site.webmanifest")
 
           if [ "${#WEB_ASSETS[@]}" -gt 0 ]; then
              mv -f "${WEB_ASSETS[@]}" public/
@@ -151,7 +175,8 @@ jobs:
              fi
 
              # Check logo status and log what will happen
-             # (logos are manually managed until upstream bitcraft-brand#32 is resolved)
+             # TODO: Remove this preservation logic once bitcraft-brand#32 is resolved
+             # and the upstream bundle always includes logos.
              shopt -s nullglob
              LOCAL_LOGOS=(public/brand/bitcraft-logo*.svg)
              BUNDLE_LOGOS=("$STAGING"/brand/bitcraft-logo*.svg)
@@ -184,7 +209,7 @@ jobs:
              shopt -u nullglob
 
              if [ "${#BRAND_FILES[@]}" -gt 0 ]; then
-                cp -R "${BRAND_FILES[@]}" public/brand/
+                mv "${BRAND_FILES[@]}" public/brand/
              else
                 echo "Warning: No files found in $STAGING/brand/"
              fi
@@ -206,6 +231,9 @@ jobs:
           # Update the local version file (atomic via temp file)
           TEMP_VERSION_FILE=$(mktemp)
           jq --arg v "$VERSION" '.version = $v' src/data/brand-version.json > "$TEMP_VERSION_FILE" && mv "$TEMP_VERSION_FILE" src/data/brand-version.json
+
+          # Mark sync as successful so cleanup doesn't restore backups
+          SYNC_SUCCESS=true
 
       - name: Create Pull Request
         if: steps.check.outputs.update_needed == 'true'
