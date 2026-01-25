@@ -6,9 +6,16 @@ on:
     - cron: '0 8 * * *'
   workflow_dispatch:
 
+concurrency:
+  group: sync-brand
+  # Queue new runs instead of cancelling - ensures no sync is dropped if triggered
+  # multiple times (e.g., manual dispatch during scheduled run)
+  cancel-in-progress: false
+
 jobs:
   check-and-sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: write
       pull-requests: write
@@ -22,6 +29,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.BRAND_REPO_READ_TOKEN }}
         run: |
+          set -euo pipefail
+
+          # Dependencies: jq (pre-installed on ubuntu-latest runners)
+          command -v jq >/dev/null || { echo "Error: jq is required"; exit 1; }
+
           # 1. Get Local Version
           LOCAL_VERSION=$(jq -r .version src/data/brand-version.json)
           echo "Current local version: $LOCAL_VERSION"
@@ -31,8 +43,8 @@ jobs:
           REMOTE_VERSION=$(gh release view --repo bitcraft-apps/bitcraft-brand --json tagName -q .tagName)
           echo "Latest remote version: $REMOTE_VERSION"
 
-          # 3. Compare
-          # Normalize versions by removing leading 'v' if present
+          # 3. Compare versions
+          # Normalize by removing leading 'v' if present
           LOCAL_CLEAN=${LOCAL_VERSION#v}
           REMOTE_CLEAN=${REMOTE_VERSION#v}
 
@@ -42,9 +54,17 @@ jobs:
             echo "Versions match. No update needed."
             echo "update_needed=false" >> $GITHUB_OUTPUT
           else
-            echo "New version found!"
-            echo "update_needed=true" >> $GITHUB_OUTPUT
-            echo "version=$REMOTE_VERSION" >> $GITHUB_OUTPUT
+            # Check for potential downgrade (remote older than local)
+            # Uses sort -V for semantic version comparison
+            OLDER=$(printf '%s\n%s' "$LOCAL_CLEAN" "$REMOTE_CLEAN" | sort -V | head -n1)
+            if [ "$OLDER" == "$REMOTE_CLEAN" ] && [ "$OLDER" != "$LOCAL_CLEAN" ]; then
+              echo "::warning::Remote version ($REMOTE_CLEAN) is older than local ($LOCAL_CLEAN). This may indicate a reverted release. Skipping sync."
+              echo "update_needed=false" >> $GITHUB_OUTPUT
+            else
+              echo "New version found!"
+              echo "update_needed=true" >> $GITHUB_OUTPUT
+              echo "version=$REMOTE_VERSION" >> $GITHUB_OUTPUT
+            fi
           fi
 
       - name: Download & Update Assets
@@ -53,62 +73,167 @@ jobs:
           GH_TOKEN: ${{ secrets.BRAND_REPO_READ_TOKEN }}
           VERSION: ${{ steps.check.outputs.version }}
         run: |
+          set -euo pipefail
+
+          # Track success for conditional cleanup
+          SYNC_SUCCESS=false
+          TEMP_VERSION_FILE=""
+
+          # Cleanup function: restores backups on failure, removes temp files always
+          cleanup() {
+            local exit_code=$?
+            if [ "$SYNC_SUCCESS" != "true" ] && [ -d "temp-logo-backup" ]; then
+              echo "Sync failed, restoring backups..."
+              mkdir -p public/brand
+              shopt -s nullglob
+              local backup_files=(temp-logo-backup/*)
+              shopt -u nullglob
+              if [ "${#backup_files[@]}" -gt 0 ]; then
+                mv "${backup_files[@]}" public/brand/ 2>/dev/null || true
+              fi
+            fi
+            rm -rf temp-download temp-unzip temp-logo-backup "$TEMP_VERSION_FILE"
+            exit $exit_code
+          }
+          trap cleanup EXIT
+
           echo "Downloading assets for version $VERSION..."
 
-          # Download the specific asset 'brand-bundle.zip' from the release
+          # Download the bundle zip from the release
           gh release download "$VERSION" \
             --repo bitcraft-apps/bitcraft-brand \
             --pattern "*brand-bundle*.zip" \
             --dir temp-download
 
-          # Prepare destination
-          rm -rf public/brand
-          mkdir -p public/brand
+          # Find the downloaded zip file (with validation)
+          # nullglob: return empty array instead of literal pattern if no matches
+          shopt -s nullglob
+          ZIP_FILES=(temp-download/*.zip)
+          shopt -u nullglob
 
-          # Unzip to a temporary directory first
+          if [ "${#ZIP_FILES[@]}" -eq 0 ]; then
+            echo "Error: No zip file found in temp-download/"
+            exit 1
+          fi
+
+          if [ "${#ZIP_FILES[@]}" -gt 1 ]; then
+            echo "Error: Multiple zip files found: ${ZIP_FILES[*]}"
+            exit 1
+          fi
+
+          ZIP_FILE="${ZIP_FILES[0]}"
+          echo "Downloaded: $ZIP_FILE"
+
+          # Unzip to a staging directory (avoid copying to repo root for security)
           unzip -o "$ZIP_FILE" -d temp-unzip
 
-          # The bundle structure is:
+          # Expected top-level directory in the bundle archive
+          BUNDLE_DIR="bundle"
+          STAGING="temp-unzip/$BUNDLE_DIR"
+
+          # Validate expected bundle structure exists
+          if [ ! -d "$STAGING" ]; then
+            echo "Error: Expected '$BUNDLE_DIR/' directory not found in zip archive"
+            echo "Has the bundle structure changed? Check bitcraft-brand releases."
+            echo "Archive contents:"
+            ls -la temp-unzip/
+            exit 1
+          fi
+
+          # Expected bundle structure:
           # bundle/
-          #   favicon-16x16.png
-          #   favicon-32x32.png
-          #   ... (standard files)
+          #   favicon-16x16.png, favicon-32x32.png, ... (standard files)
           #   brand/
           #     bitcraft-og.png
           #     tokens.css
-          #     ... (brand files)
-
-          # Move contents of the 'bundle' directory to temporary holding
-          cp -R temp-unzip/bundle/* .
+          #     bitcraft-logo*.svg (optional - see bitcraft-brand#32)
 
           # 1. Move standard web assets to public/ root
-          # We use a glob that matches the standard files we expect
-          # - favicons, android-chrome, apple-touch-icon, site.webmanifest
-          find . -maxdepth 1 -type f \( -name "favicon*" -o -name "android-chrome*" -o -name "apple-touch-icon.png" -o -name "site.webmanifest" \) -exec mv -f {} public/ \;
+          # Build array conditionally to handle both globs and literal filenames
+          mkdir -p public
+          WEB_ASSETS=()
+          shopt -s nullglob
+          for f in "$STAGING"/favicon* "$STAGING"/android-chrome*; do
+            WEB_ASSETS+=("$f")
+          done
+          shopt -u nullglob
+          # Add literal files only if they exist
+          [ -f "$STAGING/apple-touch-icon.png" ] && WEB_ASSETS+=("$STAGING/apple-touch-icon.png")
+          [ -f "$STAGING/site.webmanifest" ] && WEB_ASSETS+=("$STAGING/site.webmanifest")
 
-          # 2. Move the 'brand' subdirectory contents
-          # We now split this:
-          # - tokens.css goes to src/styles/
-          # - other brand assets (images, etc.) go to public/brand/
-          if [ -d "brand" ]; then
-             mkdir -p public/brand src/styles
-             
-             # Move tokens.css if it exists
-             if [ -f "brand/tokens.css" ]; then
-                mv -f brand/tokens.css src/styles/
-             fi
-
-             # Copy remaining contents of brand/ to public/brand/
-             cp -R brand/* public/brand/
-             rm -rf brand
+          if [ "${#WEB_ASSETS[@]}" -gt 0 ]; then
+             mv -f "${WEB_ASSETS[@]}" public/
           fi
 
-          # Clean up temp directories
-          rm -rf temp-download temp-unzip
+          # 2. Handle brand/ subdirectory
+          if [ -d "$STAGING/brand" ]; then
+             mkdir -p src/styles
 
-          # Update the local version file
-          # We use a temp file to safely write JSON
-          jq --arg v "$VERSION" '.version = $v' src/data/brand-version.json > temp.json && mv temp.json src/data/brand-version.json
+             # Move tokens.css to src/styles/
+             if [ -f "$STAGING/brand/tokens.css" ]; then
+                mv -f "$STAGING/brand/tokens.css" src/styles/
+             fi
+
+             # Check logo status and log what will happen
+             # TODO: Remove this preservation logic once bitcraft-brand#32 is resolved
+             # and the upstream bundle always includes logos.
+             shopt -s nullglob
+             LOCAL_LOGOS=(public/brand/bitcraft-logo*.svg)
+             BUNDLE_LOGOS=("$STAGING"/brand/bitcraft-logo*.svg)
+             shopt -u nullglob
+
+             if [ "${#BUNDLE_LOGOS[@]}" -gt 0 ]; then
+                echo "Bundle provides logos: ${BUNDLE_LOGOS[*]}"
+                if [ "${#LOCAL_LOGOS[@]}" -gt 0 ]; then
+                   echo "::notice::Local logos will be replaced by bundle logos. Review the PR to verify logo changes are intentional."
+                fi
+             elif [ "${#LOCAL_LOGOS[@]}" -gt 0 ]; then
+                echo "Bundle does not include logos. Preserving local logos: ${LOCAL_LOGOS[*]}"
+                mkdir -p temp-logo-backup
+                mv "${LOCAL_LOGOS[@]}" temp-logo-backup/
+             fi
+
+             # Preserve local README.md (not part of upstream bundle)
+             if [ -f "public/brand/README.md" ]; then
+                mkdir -p temp-logo-backup
+                mv "public/brand/README.md" temp-logo-backup/
+             fi
+
+             # Replace public/brand with bundle contents
+             rm -rf public/brand
+             mkdir -p public/brand
+
+             # Copy brand assets (use nullglob to handle empty directory gracefully)
+             shopt -s nullglob
+             BRAND_FILES=("$STAGING/brand/"*)
+             shopt -u nullglob
+
+             if [ "${#BRAND_FILES[@]}" -gt 0 ]; then
+                mv "${BRAND_FILES[@]}" public/brand/
+             else
+                echo "Warning: No files found in $STAGING/brand/"
+             fi
+
+             # Restore logo SVGs and README if we backed them up
+             if [ -d "temp-logo-backup" ]; then
+                shopt -s nullglob
+                BACKUP_LOGOS=(temp-logo-backup/*.svg)
+                shopt -u nullglob
+                if [ "${#BACKUP_LOGOS[@]}" -gt 0 ]; then
+                   mv "${BACKUP_LOGOS[@]}" public/brand/
+                fi
+                if [ -f "temp-logo-backup/README.md" ]; then
+                   mv "temp-logo-backup/README.md" public/brand/
+                fi
+             fi
+          fi
+
+          # Update the local version file (atomic via temp file)
+          TEMP_VERSION_FILE=$(mktemp)
+          jq --arg v "$VERSION" '.version = $v' src/data/brand-version.json > "$TEMP_VERSION_FILE" && mv "$TEMP_VERSION_FILE" src/data/brand-version.json
+
+          # Mark sync as successful so cleanup doesn't restore backups
+          SYNC_SUCCESS=true
 
       - name: Create Pull Request
         if: steps.check.outputs.update_needed == 'true'
