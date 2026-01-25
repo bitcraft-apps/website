@@ -28,7 +28,7 @@ if (!prevProject && !nextProject) {
   class="border-t border-olive-drab/20 dark:border-olive-drab/10 pt-8 mt-12"
 >
   <div class="flex flex-col sm:flex-row justify-between gap-6">
-    {/* Previous project (older) */}
+    {/* Previous project - navigates to older (earlier published) project */}
     {
       prevProject && (
         <a
@@ -50,7 +50,7 @@ if (!prevProject && !nextProject) {
       )
     }
 
-    {/* Next project (newer) */}
+    {/* Next project - navigates to newer (later published) project */}
     {
       nextProject && (
         <a

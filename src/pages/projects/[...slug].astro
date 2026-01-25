@@ -14,7 +14,9 @@ export async function getStaticPaths() {
     params: { slug: project.id },
     props: {
       project,
-      // Previous = older (next in sorted array), Next = newer (previous in sorted array)
+      // Navigation follows reading order (left=back in time, right=forward in time):
+      // - "Previous" (left arrow) goes to older project (next index in date-descending array)
+      // - "Next" (right arrow) goes to newer project (previous index in date-descending array)
       prevProject: sorted[index + 1]
         ? { id: sorted[index + 1].id, title: sorted[index + 1].data.title }
         : null,
