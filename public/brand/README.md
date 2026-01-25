@@ -1,6 +1,6 @@
 # Brand Assets
 
-This directory is **automatically managed** by the [sync-brand workflow](/.github/workflows/sync-brand.yml).
+This directory is **automatically managed** by the [sync-brand workflow](../../.github/workflows/sync-brand.yml).
 
 ## What happens during sync
 

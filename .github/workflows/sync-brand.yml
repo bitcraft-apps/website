@@ -129,7 +129,13 @@ jobs:
 
              if [ ${#LOCAL_LOGOS[@]} -gt 0 ] && [ ${#BUNDLE_LOGOS[@]} -eq 0 ]; then
                 mkdir -p temp-logo-backup
-                mv public/brand/bitcraft-logo*.svg temp-logo-backup/
+                mv "${LOCAL_LOGOS[@]}" temp-logo-backup/
+             fi
+
+             # Preserve local README.md (not part of upstream bundle)
+             if [ -f "public/brand/README.md" ]; then
+                mkdir -p temp-logo-backup
+                mv "public/brand/README.md" temp-logo-backup/
              fi
 
              # Replace public/brand with bundle contents
@@ -147,9 +153,17 @@ jobs:
                 echo "Warning: No files found in $STAGING/brand/"
              fi
 
-             # Restore logo SVGs if we backed them up
+             # Restore logo SVGs and README if we backed them up
              if [ -d "temp-logo-backup" ]; then
-                mv temp-logo-backup/*.svg public/brand/
+                shopt -s nullglob
+                BACKUP_LOGOS=(temp-logo-backup/*.svg)
+                shopt -u nullglob
+                if [ ${#BACKUP_LOGOS[@]} -gt 0 ]; then
+                   mv "${BACKUP_LOGOS[@]}" public/brand/
+                fi
+                if [ -f "temp-logo-backup/README.md" ]; then
+                   mv "temp-logo-backup/README.md" public/brand/
+                fi
                 rm -rf temp-logo-backup
              fi
           fi
