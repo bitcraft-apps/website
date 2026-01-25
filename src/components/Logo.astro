@@ -15,11 +15,10 @@ interface Props {
 
 const { variant = 'default', class: className, width = 132, height = 140 } = Astro.props;
 
-const LOGO_BASE = '/brand/logo';
 const logoMap = {
-  default: `${LOGO_BASE}/bitcraft-logo.svg`,
-  'mono-white': `${LOGO_BASE}/bitcraft-logo-mono-white.svg`,
-  'mono-black': `${LOGO_BASE}/bitcraft-logo-mono-black.svg`,
+  default: '/brand/bitcraft-logo.svg',
+  'mono-white': '/brand/bitcraft-logo-mono-white.svg',
+  'mono-black': '/brand/bitcraft-logo-mono-black.svg',
 } as const;
 
 const isAuto = variant === 'auto';

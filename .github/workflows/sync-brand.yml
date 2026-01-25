@@ -89,7 +89,7 @@ jobs:
           #   brand/
           #     bitcraft-og.png
           #     tokens.css
-          #     logo/ (optional - see bitcraft-brand#32)
+          #     bitcraft-logo*.svg (optional - see bitcraft-brand#32)
 
           # 1. Move standard web assets to public/ root
           find "$STAGING" -maxdepth 1 -type f \( -name "favicon*" -o -name "android-chrome*" -o -name "apple-touch-icon.png" -o -name "site.webmanifest" \) -exec mv -f {} public/ \;
@@ -104,10 +104,16 @@ jobs:
                 rm -f "$STAGING/brand/tokens.css"
              fi
 
-             # Preserve local logo/ directory if bundle doesn't provide one
+             # Preserve local logo SVGs if bundle doesn't provide them
              # (logos are manually managed until upstream bitcraft-brand#32 is resolved)
-             if [ -d "public/brand/logo" ] && [ ! -d "$STAGING/brand/logo" ]; then
-                mv public/brand/logo temp-logo-backup
+             shopt -s nullglob
+             LOCAL_LOGOS=(public/brand/bitcraft-logo*.svg)
+             BUNDLE_LOGOS=("$STAGING"/brand/bitcraft-logo*.svg)
+             shopt -u nullglob
+
+             if [ ${#LOCAL_LOGOS[@]} -gt 0 ] && [ ${#BUNDLE_LOGOS[@]} -eq 0 ]; then
+                mkdir -p temp-logo-backup
+                mv public/brand/bitcraft-logo*.svg temp-logo-backup/
              fi
 
              # Replace public/brand with bundle contents
@@ -115,9 +121,10 @@ jobs:
              mkdir -p public/brand
              cp -R "$STAGING/brand/"* public/brand/ 2>/dev/null || true
 
-             # Restore logo directory if we backed it up
+             # Restore logo SVGs if we backed them up
              if [ -d "temp-logo-backup" ]; then
-                mv temp-logo-backup public/brand/logo
+                mv temp-logo-backup/*.svg public/brand/
+                rm -rf temp-logo-backup
              fi
           fi
 
