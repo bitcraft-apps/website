@@ -14,7 +14,7 @@ interface Props {
   icon?: IconName;
   /** Icon hover animation */
   iconAnimation?: 'translate-x' | 'rotate' | 'none';
-  /** Open link in new tab (adds target="_blank" and rel="noopener noreferrer") */
+  /** Open link in new tab (adds target="_blank" and rel="noopener") */
   external?: boolean;
   /** Additional CSS classes */
   class?: string;
@@ -49,7 +49,7 @@ const classes = [baseClasses, variantClasses[variant], className].join(' ');
 const iconClasses = `transition-transform duration-300 ${iconAnimationClasses[iconAnimation]}`;
 
 const Element = href ? 'a' : 'button';
-const externalAttrs = href && external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+const externalAttrs = href && external ? { target: '_blank', rel: 'noopener' } : {};
 ---
 
 <Element href={href} class={classes} {...externalAttrs} {...href ? {} : { type: 'button' }}>

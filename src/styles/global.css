@@ -280,10 +280,6 @@
       border-bottom: 2px solid var(--prose-th-borders);
     }
 
-    & tbody {
-      border-collapse: collapse;
-    }
-
     & thead th {
       color: var(--prose-headings);
       font-weight: 600;
