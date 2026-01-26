@@ -21,7 +21,7 @@ const { projectCount } = Astro.props;
     <!-- Dot matrix pattern (like IDE minimap) -->
     <div class="absolute inset-0 bg-[radial-gradient(rgba(107,142,35,0.08)_1px,transparent_1px)] dark:bg-[radial-gradient(rgba(107,142,35,0.15)_1px,transparent_1px)] bg-[size:20px_20px]" />
 
-    <!-- File tree decoration - left side -->
+    <!-- File tree decoration - left side (illustrative, not reflecting actual project structure) -->
     <div class="absolute top-1/4 left-8 sm:left-16 lg:left-24 text-olive-drab/15 dark:text-olive-drab/25 font-mono text-sm hidden md:block space-y-1">
       <div class="flex items-center gap-2">
         <Icon name="folder" size="sm" />
@@ -30,17 +30,17 @@ const { projectCount } = Astro.props;
       <div class="flex items-center gap-2 ml-4">
         <span class="text-xs">├──</span>
         <Icon name="document" size="xs" />
-        <span>web-apps</span>
+        <span>project-001</span>
       </div>
       <div class="flex items-center gap-2 ml-4">
         <span class="text-xs">├──</span>
         <Icon name="document" size="xs" />
-        <span>tools</span>
+        <span>project-002</span>
       </div>
       <div class="flex items-center gap-2 ml-4">
         <span class="text-xs">└──</span>
         <Icon name="document" size="xs" />
-        <span>experiments</span>
+        <span>project-003</span>
       </div>
     </div>
 
@@ -54,14 +54,14 @@ const { projectCount } = Astro.props;
     </div>
 
     <!-- Gradient orbs (softer, for depth) -->
-    <div class="absolute top-0 -right-32 w-64 h-64 bg-forest-green/5 dark:bg-forest-green/10 rounded-full blur-3xl" />
-    <div class="absolute bottom-0 -left-32 w-80 h-80 bg-olive-drab/5 dark:bg-olive-drab/10 rounded-full blur-3xl" />
+    <div class="absolute top-0 -right-32 w-64 h-64 bg-forest-green/5 dark:bg-forest-green/10 rounded-full blur-3xl animate-pulse-slow" />
+    <div class="absolute bottom-0 -left-32 w-80 h-80 bg-olive-drab/5 dark:bg-olive-drab/10 rounded-full blur-3xl animate-pulse-slow animation-delay-2000" />
   </div>
 
   <!-- Main content -->
   <div class="relative z-10 text-center max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-    <!-- Project count badge -->
-    {projectCount !== undefined && (
+    <!-- Project count badge (hidden when no projects) -->
+    {projectCount !== undefined && projectCount > 0 && (
       <div class="inline-flex items-center gap-2 px-4 py-2 mb-6 bg-forest-green/10 border border-forest-green/20 rounded-full text-forest-green text-sm font-medium">
         <span class="w-2 h-2 bg-forest-green rounded-full" />
         {projectCount} {projectCount === 1 ? 'Project' : 'Projects'}
